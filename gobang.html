@@ -204,13 +204,6 @@
       </label>
     </div>
     <div>
-      难度: <select id="difficulty" onchange="setDifficulty()" style="padding:5px;border-radius:5px;">
-        <option value="easy">🌱 简单</option>
-        <option value="medium" selected>🌿 中等</option>
-        <option value="hard">🌳 困难</option>
-      </select>
-    </div>
-    <div>
       你执: <span id="humanColor" class="current-player black">⚫ 黑方</span>
     </div>
     <div>
@@ -245,10 +238,8 @@
     let currentPlayer = 1; // 1: 黑方, 2: 白方
     let gameOver = false;
     let history = [];
-    let lastMove = null; // 记录最后一步
     let mode = 'pve'; // 'pvp' 或 'pve'
     let humanPlayer = 1; // 人类玩家执黑(1)或白(2)
-    let difficulty = 'medium'; // 难度: easy, medium, hard
     let soundEnabled = true;
     
     // 音效
@@ -346,7 +337,6 @@
       currentPlayer = 1;
       gameOver = false;
       history = [];
-      lastMove = null; // 重置最后一步标记
       updatePlayerDisplay();
       drawBoard();
       hideWinner();
@@ -422,15 +412,6 @@
       ctx.strokeStyle = player === 1 ? '#000' : '#999';
       ctx.lineWidth = 1;
       ctx.stroke();
-      
-      // 最后一步棋加黄色边框高亮
-      if (lastMove && lastMove.i === i && lastMove.j === j) {
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
-        ctx.stroke();
-      }
     }
     
     // 点击处理
@@ -468,7 +449,6 @@
     function placePiece(i, j, player) {
       board[i][j] = player;
       history.push({ i, j, player });
-      lastMove = { i, j, player }; // 记录最后一步
       drawBoard();
       playSound('place');
       
@@ -503,54 +483,43 @@
         }
       }
       
-      // 2. 检查是否需要防守（对手即将获胜）- 中等/困难难度才防守
-      if (difficulty !== 'easy') {
-        for (let i = 0; i < BOARD_SIZE; i++) {
-          for (let j = 0; j < BOARD_SIZE; j++) {
-            if (board[i][j] === 0) {
-              board[i][j] = humanPlayer;
-              if (checkWin(i, j, humanPlayer)) {
-                board[i][j] = 0;
-                placePiece(i, j, aiPlayer);
-                currentPlayer = humanPlayer;
-                updatePlayerDisplay();
-                document.getElementById('thinking').style.display = 'none';
-                canvas.style.cursor = 'pointer';
-                return;
-              }
+      // 2. 检查是否需要防守（对手即将获胜）
+      for (let i = 0; i < BOARD_SIZE; i++) {
+        for (let j = 0; j < BOARD_SIZE; j++) {
+          if (board[i][j] === 0) {
+            board[i][j] = humanPlayer;
+            if (checkWin(i, j, humanPlayer)) {
               board[i][j] = 0;
+              placePiece(i, j, aiPlayer);
+              currentPlayer = humanPlayer;
+              updatePlayerDisplay();
+              document.getElementById('thinking').style.display = 'none';
+              canvas.style.cursor = 'pointer';
+              return;
             }
+            board[i][j] = 0;
           }
         }
       }
       
-      // 3. 根据难度选择落子
+      // 3. 智能评分算法
       let bestScore = -Infinity;
       let bestMove = null;
-      let allMoves = [];
       
       for (let i = 0; i < BOARD_SIZE; i++) {
         for (let j = 0; j < BOARD_SIZE; j++) {
           if (board[i][j] === 0 && hasNeighbor(i, j, 1)) {
+            // 评估进攻分数（AI能形成什么）
             const attackScore = evaluatePositionSmart(i, j, aiPlayer);
+            // 评估防守分数（人类可能形成什么）
             const defendScore = evaluatePositionSmart(i, j, humanPlayer);
             
-            let score;
-            if (difficulty === 'easy') {
-              // 简单：主要看中心位置，随机性大
-              score = attackScore * 0.3 + defendScore * 0.3;
-            } else if (difficulty === 'medium') {
-              // 中等：平衡
-              score = attackScore + defendScore * 1.0;
-            } else {
-              // 困难：防守优先，更聪明
-              score = attackScore + defendScore * 1.5;
-            }
+            // 防守优先！挡住人类的威胁更重要
+            let score = attackScore + defendScore * 1.2;
             
+            // 中心位置加分
             const centerDist = Math.abs(i - 7) + Math.abs(j - 7);
             score += (14 - centerDist) * 2;
-            
-            allMoves.push({i, j, score});
             
             if (score > bestScore) {
               bestScore = score;
@@ -558,14 +527,6 @@
             }
           }
         }
-      }
-      
-      // 简单难度：有一定概率选择次优选
-      if (difficulty === 'easy' && allMoves.length > 1) {
-        const sorted = allMoves.sort((a, b) => b.score - a.score);
-        const topCount = Math.min(3, sorted.length);
-        const randomIdx = Math.floor(Math.random() * topCount);
-        bestMove = {i: sorted[randomIdx].i, j: sorted[randomIdx].j};
       }
       
       // 如果找不到好位置（开局），选择靠近中心的空位
@@ -595,11 +556,6 @@
       
       document.getElementById('thinking').style.display = 'none';
       canvas.style.cursor = 'pointer';
-    }
-    
-    // 设置难度
-    function setDifficulty() {
-      difficulty = document.getElementById('difficulty').value;
     }
     
     // 检查周围是否有棋子
@@ -763,46 +719,37 @@
       document.getElementById('winner').classList.remove('show');
     }
     
-    // 悔棋 - 只悔一步
-    // 优化悔棋功能
+    // 悔棋
     function undo() {
-      console.log('undo clicked, history:', history.length, 'gameOver:', gameOver, 'mode:', mode);
+      console.log('undo clicked, history length:', history.length, 'gameOver:', gameOver);
       
       if (history.length === 0 || gameOver) {
-        console.log('cannot undo - no history or game over');
+        console.log('undo aborted');
         return;
       }
       
-      // 人机模式：同时撤销玩家和AI的两步
+      // 人机模式：撤销上一步AI的子 + 上一步人类的子
       if (mode === 'pve') {
-        console.log('pve mode, history length:', history.length);
-        
-        // 撤销两步（AI + 玩家）
-        let removed = 0;
-        while (history.length > 0 && removed < 2) {
-          const move = history.pop();
-          console.log('removing piece at', move.i, move.j);
-          board[move.i][move.j] = 0;
-          removed++;
-        }
-        
-        // 重置为玩家回合
-        currentPlayer = humanPlayer;
-        
-        // 更新最后一步标记
+        // 撤销AI（白方）最后一步
         if (history.length > 0) {
-          lastMove = history[history.length - 1];
-        } else {
-          lastMove = null;
+          const moveAI = history.pop();
+          board[moveAI.i][moveAI.j] = 0;
+          console.log('removed white piece at', moveAI.i, moveAI.j);
         }
+        // 撤销人类（黑方）最后一步
+        if (history.length > 0) {
+          const moveHuman = history.pop();
+          board[moveHuman.i][moveHuman.j] = 0;
+          console.log('removed black piece at', moveHuman.i, moveHuman.j);
+        }
+        // 一定是你（黑方）先落子
+        currentPlayer = 1;
       } else {
         // 双人模式：撤销一步
         if (history.length > 0) {
           const move = history.pop();
-          console.log('removing piece at', move.i, move.j);
           board[move.i][move.j] = 0;
           currentPlayer = move.player;
-          lastMove = history.length > 0 ? history[history.length - 1] : null;
         }
       }
       
