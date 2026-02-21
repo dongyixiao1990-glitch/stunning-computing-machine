@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yixiao Dong | Software Quality Assurance Engineer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        .header .title {
+            font-size: 1.3rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        
+        .contact-item svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .section {
+            padding: 40px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        
+        .about {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .experience-item {
+            margin-bottom: 30px;
+            padding-left: 20px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .experience-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .exp-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        
+        .exp-company {
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        .exp-period {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .exp-role {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+        
+        .exp-description {
+            color: #555;
+            margin-bottom: 12px;
+        }
+        
+        .exp-description ul {
+            padding-left: 20px;
+        }
+        
+        .exp-description li {
+            margin-bottom: 6px;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .skill-category {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .skill-category:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .skill-category h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+        
+        .skill-category p {
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .education-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .education-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .edu-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        
+        .edu-info p {
+            color: #555;
+            margin-top: 4px;
+        }
+        
+        .edu-period {
+            background: #667eea;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .languages {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .language-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .language-item .lang-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .language-item .lang-level {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        
+        .certifications {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .cert-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .footer p {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .section {
+                padding: 30px 20px;
+            }
+            
+            .exp-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .education-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>YIXIAO DONG</h1>
+            <p class="title">Software Quality Assurance Engineer</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    <span>+358 415769844</span>
+                </div>
+                <div class="contact-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    <span>dongyixiao1990@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    <span>Kartanonkatu 17 B, Forssa</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <h2 class="section-title">About Me</h2>
+            <p class="about">
+                ISTQB Certified QA Engineer with 5+ years of experience in FinTech and Global E-commerce. Specialized in Live Payment Testing (Ant Group) and Global Regression (Nike). Proven track record in managing test assets and coordinating distributed teams. Passionate about AI-driven testing and quality innovation.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Experience</h2>
+            
+            <div class="experience-item">
+                <div class="exp-header">
+                    <div>
+                        <div class="exp-title">Applause</div>
+                        <div class="exp-company">Software QA Engineer</div>
+                    </div>
+                    <div class="exp-period">2021 - Present</div>
+                </div>
+                
+                <div class="exp-description">
+                    <p class="exp-role">FinTech & Live Payment Lead (Ant Group/Alipay+)</p>
+                    <ul>
+                        <li>Spearheaded Live Payment Testing with real-money transactions across APAC & EMEA markets</li>
+                        <li>Validated diverse local payment methods (e.g., BLIK, KakaoPay)</li>
+                        <li>Managed the lifecycle of "passive" recipient accounts/SIM assets across 6+ countries to ensure 24/7 testing infrastructure availability</li>
+                    </ul>
+                </div>
+                
+                <div class="exp-description">
+                    <p class="exp-role">Global E-commerce Regression (Nike)</p>
+                    <ul>
+                        <li>Orchestrated weekly E2E regression cycles across 15+ countries on Web and Mobile</li>
+                        <li>Executed high-risk production verification (OMOBO) for order/cancellation logic</li>
+                        <li>Validated complex payment integrations (Klarna, AfterPay, Apple Pay) to ensure financial accuracy</li>
+                    </ul>
+                </div>
+                
+                <div class="exp-description">
+                    <p class="exp-role">Defect & Team Management</p>
+                    <ul>
+                        <li>Managed the full defect lifecycle in JIRA</li>
+                        <li>Acted as primary liaison between Test Architects and engineering teams</li>
+                        <li>Assembled and led distributed tester teams, optimizing workflows</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="experience-item">
+                <div class="exp-header">
+                    <div>
+                        <div class="exp-title">uTest</div>
+                        <div class="exp-company">QA Functional/Usability Tester</div>
+                    </div>
+                    <div class="exp-period">2020 - 2021</div>
+                </div>
+                
+                <div class="exp-description">
+                    <ul>
+                        <li>Completed 5,609+ test cases and reported 1,488 verified bugs</li>
+                        <li>Recognized as "Favorite Tester" on 11 distinct projects</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Expertise</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>FinTech QA</h3>
+                    <p>Live Payments, Digital Wallets, Cross-border Transactions</p>
+                </div>
+                <div class="skill-category">
+                    <h3>E-commerce QA</h3>
+                    <p>Global Regression, Order Management (OMOBO)</p>
+                </div>
+                <div class="skill-category">
+                    <h3>Test Management</h3>
+                    <p>Asset Management, JIRA, TestRail</p>
+                </div>
+                <div class="skill-category">
+                    <h3>Technical</h3>
+                    <p>SQL Basics, Python Basics, Charles Proxy</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Education</h2>
+            <div class="education-item">
+                <div class="edu-info">
+                    <h3>Wuhan University of Science and Technology</h3>
+                    <p>Master's degree, Master of Business Administration (MBA)</p>
+                </div>
+                <div class="edu-period">2020 - 2023</div>
+            </div>
+            <div class="education-item">
+                <div class="edu-info">
+                    <h3>Civil Aviation University of China</h3>
+                    <p>Bachelor's degree, Air Traffic Controller</p>
+                </div>
+                <div class="edu-period">2009 - 2013</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Languages</h2>
+            <div class="languages">
+                <div class="language-item">
+                    <div class="lang-name">Chinese</div>
+                    <div class="lang-level">Native</div>
+                </div>
+                <div class="language-item">
+                    <div class="lang-name">English</div>
+                    <div class="lang-level">Full Professional</div>
+                </div>
+                <div class="language-item">
+                    <div class="lang-name">Finnish</div>
+                    <div class="lang-level">Beginner</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Certifications</h2>
+            <div class="certifications">
+                <div class="cert-badge">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    ISTQB® CTFL
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>© 2026 Yixiao Dong. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
