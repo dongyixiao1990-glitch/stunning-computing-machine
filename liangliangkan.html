@@ -37,6 +37,7 @@
             padding: 10px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
         }
         .cell {
             width: 45px; height: 45px;
@@ -49,13 +50,22 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
+            position: relative;
+            z-index: 1;
         }
         .cell:hover { transform: scale(1.1); }
         .cell.selected { border-color: #f39c12; background: #fff8e1; }
         .cell.matched { opacity: 0; pointer-events: none; }
         .cell.empty { background: transparent; cursor: default; }
         
-        .foods { display: none; }
+        /* Connection line canvas */
+        #connectionCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
         
         .sidebar {
             display: flex;
@@ -83,12 +93,6 @@
             min-height: 80px;
         }
         .selected-info .icon { font-size: 40px; }
-        
-        .line-canvas {
-            position: absolute;
-            pointer-events: none;
-            z-index: 10;
-        }
         
         .level-select {
             display: flex;
@@ -160,6 +164,7 @@
     <div class="game-container">
         <div style="position:relative">
             <div class="board" id="board"></div>
+            <canvas id="connectionCanvas"></canvas>
         </div>
         <div class="sidebar">
             <div class="selected-info">
@@ -178,28 +183,28 @@
     </div>
 
     <script>
-        // 冰箱食物图标
+        // 冰箱食物图标 - 修复：牛奶和酸奶用不同图标
         const foods = [
-            { icon: '🥛', name: '牛奶' },
-            { icon: '🧈', name: '黄油' },
-            { icon: '🥛', name: '酸奶' },
-            { icon: '🧀', name: '奶酪' },
-            { icon: '🥚', name: '鸡蛋' },
-            { icon: '🥬', name: '生菜' },
-            { icon: '🍅', name: '番茄' },
-            { icon: '🥒', name: '黄瓜' },
-            { icon: '🍌', name: '香蕉' },
-            { icon: '🍎', name: '苹果' },
-            { icon: '🍊', name: '橙子' },
-            { icon: '🍇', name: '葡萄' },
-            { icon: '🥕', name: '胡萝卜' },
-            { icon: '🌽', name: '玉米' },
-            { icon: '🥦', name: '西兰花' },
-            { icon: '🍗', name: '鸡肉' },
-            { icon: '🥩', name: '牛肉' },
-            { icon: '🐟', name: '鱼肉' },
-            { icon: '🍞', name: '面包' },
-            { icon: '🍰', name: '蛋糕' },
+            { icon: '🥛', name: '牛奶', id: 'milk' },
+            { icon: '🧈', name: '黄油', id: 'butter' },
+            { icon: '🥛', name: '酸奶', id: 'yogurt' },  // 使用不同的id
+            { icon: '🧀', name: '奶酪', id: 'cheese' },
+            { icon: '🥚', name: '鸡蛋', id: 'egg' },
+            { icon: '🥬', name: '生菜', id: 'lettuce' },
+            { icon: '🍅', name: '番茄', id: 'tomato' },
+            { icon: '🥒', name: '黄瓜', id: 'cucumber' },
+            { icon: '🍌', name: '香蕉', id: 'banana' },
+            { icon: '🍎', name: '苹果', id: 'apple' },
+            { icon: '🍊', name: '橙子', id: 'orange' },
+            { icon: '🍇', name: '葡萄', id: 'grape' },
+            { icon: '🥕', name: '胡萝卜', id: 'carrot' },
+            { icon: '🌽', name: '玉米', id: 'corn' },
+            { icon: '🥦', name: '西兰花', id: 'broccoli' },
+            { icon: '🍗', name: '鸡肉', id: 'chicken' },
+            { icon: '🥩', name: '牛肉', id: 'beef' },
+            { icon: '🐟', name: '鱼肉', id: 'fish' },
+            { icon: '🍞', name: '面包', id: 'bread' },
+            { icon: '🍰', name: '蛋糕', id: 'cake' },
         ];
         
         let cols = 10, rows = 8;
@@ -207,6 +212,20 @@
         let selected = null;
         let matched = [];
         let timer = 0, timerInterval = null;
+        let canvas, ctx;
+        
+        // Initialize canvas
+        window.onload = function() {
+            canvas = document.getElementById('connectionCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+        };
+        
+        function resizeCanvas() {
+            const boardEl = document.getElementById('board');
+            canvas.width = boardEl.offsetWidth;
+            canvas.height = boardEl.offsetHeight;
+        }
         
         function setLevel(c, r) {
             cols = c; rows = r;
@@ -231,8 +250,9 @@
             
             for (let i = 0; i < pairs; i++) {
                 const food = foods[i % foods.length];
-                tiles.push({ ...food, id: i });
-                tiles.push({ ...food, id: i });
+                // Use unique id for each pair
+                tiles.push({ icon: food.icon, name: food.name, pairId: i });
+                tiles.push({ icon: food.icon, name: food.name, pairId: i });
             }
             
             tiles = shuffleArray(tiles);
@@ -275,6 +295,7 @@
             }
             
             document.getElementById('remaining').textContent = remaining / 2;
+            resizeCanvas();
         }
         
         function handleClick(r, c) {
@@ -289,18 +310,27 @@
                 selected = null;
                 document.getElementById('selectedIcon').textContent = '❓';
                 document.getElementById('selectedName').textContent = '选择食物';
-            } else if (selected.tile.id === tile.id) {
-                // 检查是否可连接
+            } else if (selected.tile.pairId === tile.pairId) {
+                // 检查是否可连接 - 使用 pairId 来匹配
                 if (canConnect(selected.r, selected.c, r, c)) {
-                    // 消除
-                    board[selected.r][selected.c] = null;
-                    board[r][c] = null;
-                    selected = null;
-                    document.getElementById('selectedIcon').textContent = '❓';
-                    document.getElementById('selectedName').textContent = '选择食物';
+                    // 绘制连接线
+                    drawConnection(selected.r, selected.c, r, c);
                     
-                    render();
-                    checkWin();
+                    // 延迟消除，让用户看到连接线
+                    setTimeout(() => {
+                        board[selected.r][selected.c] = null;
+                        board[r][c] = null;
+                        selected = null;
+                        document.getElementById('selectedIcon').textContent = '❓';
+                        document.getElementById('selectedName').textContent = '选择食物';
+                        
+                        // 清除连接线
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        
+                        render();
+                        checkWin();
+                    }, 300);
+                    return;
                 } else {
                     selected = { r, c, tile };
                     document.getElementById('selectedIcon').textContent = tile.icon;
@@ -312,6 +342,45 @@
                 document.getElementById('selectedName').textContent = tile.name;
             }
             render();
+        }
+        
+        function drawConnection(r1, c1, r2, c2) {
+            // 计算单元格中心位置
+            const cellSize = 45;
+            const gap = 3;
+            const padding = 10;
+            
+            const x1 = padding + c1 * (cellSize + gap) + cellSize / 2;
+            const y1 = padding + r1 * (cellSize + gap) + cellSize / 2;
+            const x2 = padding + c2 * (cellSize + gap) + cellSize / 2;
+            const y2 = padding + r2 * (cellSize + gap) + cellSize / 2;
+            
+            // 绘制发光连接线
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 外发光
+            ctx.strokeStyle = '#f39c12';
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.shadowColor = '#f39c12';
+            ctx.shadowBlur = 15;
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            
+            // 直线连接（简单方案）
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            
+            // 内部亮线
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
         }
         
         function canConnect(r1, c1, r2, c2) {
@@ -367,7 +436,6 @@
         }
         
         function showHint() {
-            // 简单提示：找到第一对可消除的
             let tiles = [];
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
@@ -377,9 +445,8 @@
             
             for (let i = 0; i < tiles.length; i++) {
                 for (let j = i + 1; j < tiles.length; j++) {
-                    if (tiles[i].tile.id === tiles[j].tile.id) {
+                    if (tiles[i].tile.pairId === tiles[j].tile.pairId) {
                         if (canConnect(tiles[i].r, tiles[i].c, tiles[j].r, tiles[j].c)) {
-                            // 高亮显示
                             selected = tiles[i];
                             handleClick(tiles[j].r, tiles[j].c);
                             return;
@@ -408,6 +475,7 @@
                 }
             }
             selected = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             render();
         }
         
@@ -434,6 +502,7 @@
         function newGame() {
             document.getElementById('success').classList.remove('show');
             selected = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             initBoard();
             render();
             startTimer();
