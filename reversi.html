@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>黑白棋 Reversi</title>
+    <title>黑白棋 Reversi - AI对战版</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; 
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             display: flex;
@@ -16,12 +16,42 @@
             padding: 20px;
             color: white;
         }
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .subtitle { color: #aaa; margin-bottom: 20px; }
+        h1 { font-size: 2rem; margin-bottom: 10px; }
+        .subtitle { color: #aaa; margin-bottom: 15px; }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-group label { color: #aaa; }
+        
+        select, button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        select { background: #333; color: white; }
+        button {
+            background: #f39c12;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        button:hover { transform: scale(1.05); }
+        
         .game-info {
             display: flex;
             gap: 40px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-size: 1.2rem;
         }
         .player { 
@@ -41,11 +71,12 @@
         .disc.black { background: #222; }
         .disc.white { background: #eee; }
         .score { font-weight: bold; color: #f39c12; }
+        
         .board {
             display: grid;
             grid-template-columns: repeat(8, 50px);
             grid-template-rows: repeat(8, 50px);
-            gap: 2px;
+            gap: 1px;
             background: #333;
             padding: 5px;
             border-radius: 10px;
@@ -58,41 +89,28 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 2px;
         }
         .cell:hover { background: #2ecc71; }
-        .cell.valid:hover { background: #f39c12; }
+        .cell.valid { background: #f39c12; }
+        .cell.valid:hover { background: #e67e22; }
+        
         .cell .disc {
             width: 40px; height: 40px;
             transition: transform 0.3s;
         }
-        .cell .disc.flip {
-            animation: flip 0.4s ease;
+        
+        .ai-thinking {
+            color: #e74c3c;
+            font-style: italic;
+            animation: blink 1s infinite;
         }
-        @keyframes flip {
-            0% { transform: scaleX(1); }
-            50% { transform: scaleX(0); }
-            100% { transform: scaleX(1); }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        button {
-            padding: 12px 25px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            background: #f39c12;
-            color: #1a1a2e;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-        button:hover { transform: scale(1.05); }
-        button.secondary { background: #555; color: white; }
-        .winner {
+        
+        .winner-modal {
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -103,8 +121,13 @@
             z-index: 100;
             display: none;
         }
-        .winner.show { display: block; }
-        .winner h2 { font-size: 2rem; color: #f39c12; margin-bottom: 10px; }
+        .winner-modal.show { display: block; }
+        .winner-modal h2 { font-size: 2rem; color: #f39c12; margin-bottom: 10px; }
+        .winner-modal button {
+            margin-top: 20px;
+            padding: 12px 30px;
+        }
+        
         .back-link {
             position: fixed;
             top: 20px; left: 20px;
@@ -113,63 +136,88 @@
             font-size: 1rem;
         }
         .back-link:hover { color: #f39c12; }
+        
+        @media (max-width: 500px) {
+            .board {
+                grid-template-columns: repeat(8, 40px);
+                grid-template-rows: repeat(8, 40px);
+            }
+            .cell { width: 40px; height: 40px; }
+            .cell .disc { width: 32px; height: 32px; }
+        }
     </style>
 </head>
 <body>
     <a href="index.html#games" class="back-link">← 返回作品集</a>
-    <h1>黑白棋 Reversi</h1>
-    <p class="subtitle">经典策略棋类游戏</p>
+    <h1>黑白棋 Reversi - AI对战版</h1>
+    <p class="subtitle">与AI对战，三个难度级别</p>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label>难度:</label>
+            <select id="difficulty">
+                <option value="1">简单 (随机)</option>
+                <option value="2" selected>中等 (策略)</option>
+                <option value="3">困难 ( Minimax)</option>
+            </select>
+        </div>
+        <button onclick="newGame()">新游戏</button>
+        <button onclick="undo()">悔棋</button>
+    </div>
     
     <div class="game-info">
         <div class="player active" id="playerBlack">
             <div class="disc black"></div>
-            <span>黑方</span>
+            <span>你 (黑棋)</span>
             <span class="score" id="blackScore">2</span>
         </div>
         <div class="player" id="playerWhite">
             <div class="disc white"></div>
-            <span>白方</span>
+            <span>AI (白棋)</span>
             <span class="score" id="whiteScore">2</span>
         </div>
     </div>
     
     <div class="board" id="board"></div>
     
-    <div class="controls">
-        <button onclick="newGame()">新游戏</button>
-        <button class="secondary" onclick="undo()">悔棋</button>
-    </div>
+    <p id="aiStatus" style="margin-top:15px; color:#aaa;"></p>
     
-    <div class="winner" id="winner">
+    <div class="winner-modal" id="winner">
         <h2 id="winnerText">游戏结束!</h2>
         <p id="winnerScore"></p>
-        <button onclick="newGame()" style="margin-top:20px">再来一局</button>
+        <button onclick="newGame()">再来一局</button>
     </div>
 
     <script>
         const BOARD_SIZE = 8;
         let board = [];
-        let currentPlayer = 'black';
+        let currentPlayer = 1; // 1=黑棋(玩家), 2=白棋(AI)
         let history = [];
+        let difficulty = 2;
+        let isAIThinking = false;
+        
+        document.getElementById('difficulty').addEventListener('change', function() {
+            difficulty = parseInt(this.value);
+        });
         
         function initBoard() {
-            board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
-            board[3][3] = 'white';
-            board[3][4] = 'black';
-            board[4][3] = 'black';
-            board[4][4] = 'white';
-            currentPlayer = 'black';
+            board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(0));
+            board[3][3] = 2;
+            board[3][4] = 1;
+            board[4][3] = 1;
+            board[4][4] = 2;
+            currentPlayer = 1;
             history = [];
             saveHistory();
         }
         
         function getValidMoves(player) {
             const moves = [];
-            const opponent = player === 'black' ? 'white' : 'black';
+            const opponent = player === 1 ? 2 : 1;
             
             for (let row = 0; row < BOARD_SIZE; row++) {
                 for (let col = 0; col < BOARD_SIZE; col++) {
-                    if (board[row][col] !== null) continue;
+                    if (board[row][col] !== 0) continue;
                     
                     const directions = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
                     for (const [dr, dc] of directions) {
@@ -192,7 +240,7 @@
         
         function getFlipped(row, col, player) {
             const flipped = [];
-            const opponent = player === 'black' ? 'white' : 'black';
+            const opponent = player === 1 ? 2 : 1;
             const directions = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
             
             for (const [dr, dc] of directions) {
@@ -211,7 +259,7 @@
         }
         
         function makeMove(row, col, player = currentPlayer) {
-            if (board[row][col] !== null) return false;
+            if (board[row][col] !== 0) return false;
             const flipped = getFlipped(row, col, player);
             if (flipped.length === 0) return false;
             
@@ -230,14 +278,14 @@
             if (history.length > 1) {
                 history.pop();
                 board = JSON.parse(JSON.stringify(history[history.length - 1]));
-                currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+                currentPlayer = 1;
                 render();
             }
         }
         
         function switchPlayer() {
             const validMoves = getValidMoves(currentPlayer);
-            const opponent = currentPlayer === 'black' ? 'white' : 'black';
+            const opponent = currentPlayer === 1 ? 2 : 1;
             const opponentMoves = getValidMoves(opponent);
             
             if (opponentMoves.length > 0) {
@@ -249,17 +297,17 @@
         }
         
         function endGame() {
-            const blackCount = board.flat().filter(c => c === 'black').length;
-            const whiteCount = board.flat().filter(c => c === 'white').length;
+            const blackCount = board.flat().filter(c => c === 1).length;
+            const whiteCount = board.flat().filter(c => c === 2).length;
             const winnerText = document.getElementById('winnerText');
             const winnerScore = document.getElementById('winnerScore');
             
             if (blackCount > whiteCount) {
-                winnerText.textContent = '黑方获胜! 🎉';
+                winnerText.textContent = '🎉 你获胜!';
             } else if (whiteCount > blackCount) {
-                winnerText.textContent = '白方获胜! 🎉';
+                winnerText.textContent = '🤖 AI获胜!';
             } else {
-                winnerText.textContent = '平局! 🤝';
+                winnerText.textContent = '🤝 平局!';
             }
             winnerScore.textContent = `黑: ${blackCount}  白: ${whiteCount}`;
             document.getElementById('winner').classList.add('show');
@@ -275,36 +323,239 @@
                     const cell = document.createElement('div');
                     cell.className = 'cell';
                     
-                    const isValid = validMoves.some(([r, c]) => r === row && c === col);
+                    const isValid = currentPlayer === 1 && validMoves.some(([r, c]) => r === row && c === col);
                     if (isValid) {
                         cell.classList.add('valid');
                         cell.onclick = () => handleClick(row, col);
                     }
                     
-                    if (board[row][col]) {
+                    if (board[row][col] !== 0) {
                         const disc = document.createElement('div');
-                        disc.className = `disc ${board[row][col]}`;
+                        disc.className = `disc ${board[row][col] === 1 ? 'black' : 'white'}`;
                         cell.appendChild(disc);
                     }
                     boardEl.appendChild(cell);
                 }
             }
             
-            document.getElementById('blackScore').textContent = board.flat().filter(c => c === 'black').length;
-            document.getElementById('whiteScore').textContent = board.flat().filter(c => c === 'white').length;
+            document.getElementById('blackScore').textContent = board.flat().filter(c => c === 1).length;
+            document.getElementById('whiteScore').textContent = board.flat().filter(c => c === 2).length;
             
-            document.getElementById('playerBlack').classList.toggle('active', currentPlayer === 'black');
-            document.getElementById('playerWhite').classList.toggle('active', currentPlayer === 'white');
+            document.getElementById('playerBlack').classList.toggle('active', currentPlayer === 1);
+            document.getElementById('playerWhite').classList.toggle('active', currentPlayer === 2);
+            
+            // AI thinking status
+            const aiStatus = document.getElementById('aiStatus');
+            if (isAIThinking) {
+                aiStatus.textContent = '🤔 AI正在思考...';
+                aiStatus.className = 'ai-thinking';
+            } else {
+                aiStatus.textContent = '';
+            }
         }
         
         function handleClick(row, col) {
+            if (isAIThinking) return;
+            
             if (makeMove(row, col)) {
                 render();
                 setTimeout(() => {
                     switchPlayer();
-                    render();
+                    if (currentPlayer === 2) {
+                        aiMove();
+                    } else {
+                        render();
+                    }
                 }, 300);
             }
+        }
+        
+        // AI Functions
+        function aiMove() {
+            isAIThinking = true;
+            render();
+            
+            setTimeout(() => {
+                let move;
+                
+                if (difficulty === 1) {
+                    move = aiEasy();
+                } else if (difficulty === 2) {
+                    move = aiMedium();
+                } else {
+                    move = aiHard();
+                }
+                
+                if (move) {
+                    makeMove(move[0], move[1]);
+                }
+                
+                isAIThinking = false;
+                switchPlayer();
+                render();
+            }, 500);
+        }
+        
+        function aiEasy() {
+            const moves = getValidMoves(2);
+            if (moves.length === 0) return null;
+            return moves[Math.floor(Math.random() * moves.length)];
+        }
+        
+        function aiMedium() {
+            const moves = getValidMoves(2);
+            if (moves.length === 0) return null;
+            
+            // 1. Try to win
+            for (const move of moves) {
+                const tempBoard = JSON.parse(JSON.stringify(board));
+                board[move[0]][move[1]] = 2;
+                const flipped = getFlipped(move[0], move[1], 2);
+                flipped.forEach(([r, c]) => board[r][c] = 2);
+                if (checkWin(2)) {
+                    board = tempBoard;
+                    return move;
+                }
+                board = tempBoard;
+            }
+            
+            // 2. Block opponent's win
+            for (const move of moves) {
+                const tempBoard = JSON.parse(JSON.stringify(board));
+                board[move[0]][move[1]] = 2;
+                const flipped = getFlipped(move[0], move[1], 2);
+                flipped.forEach(([r, c]) => board[r][c] = 2);
+                
+                // Check if player can win after this move
+                let playerCanWin = false;
+                const playerMoves = getValidMoves(1);
+                for (const pm of playerMoves) {
+                    board[pm[0]][pm[1]] = 1;
+                    const pflipped = getFlipped(pm[0], pm[1], 1);
+                    pflipped.forEach(([r, c]) => board[r][c] = 1);
+                    if (checkWin(1)) {
+                        playerCanWin = true;
+                    }
+                    board[pm[0]][pm[1]] = 0;
+                    pflipped.forEach(([r, c]) => board[r][c] = 2);
+                }
+                board = tempBoard;
+                
+                if (!playerCanWin) {
+                    return move;
+                }
+            }
+            
+            // 3. Random
+            return moves[Math.floor(Math.random() * moves.length)];
+        }
+        
+        function aiHard() {
+            const moves = getValidMoves(2);
+            if (moves.length === 0) return null;
+            
+            let bestScore = -Infinity;
+            let bestMove = null;
+            
+            for (const move of moves) {
+                const score = minimax(move, 2, -Infinity, Infinity, false);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = move;
+                }
+            }
+            
+            return bestMove || moves[0];
+        }
+        
+        function minimax(move, depth, alpha, beta, isMaximizing) {
+            // Apply move
+            const row = move[0], col = move[1];
+            const flipped = getFlipped(row, col, 2);
+            const tempBoard = JSON.parse(JSON.stringify(board));
+            
+            board[row][col] = 2;
+            flipped.forEach(([r, c]) => board[r][c] = 2);
+            
+            if (depth === 0) {
+                board = tempBoard;
+                return evaluateBoard(2);
+            }
+            
+            const nextPlayer = isMaximizing ? 2 : 1;
+            const moves = getValidMoves(nextPlayer);
+            
+            if (moves.length === 0) {
+                const black = board.flat().filter(c => c === 1).length;
+                const white = board.flat().filter(c => c === 2).length;
+                board = tempBoard;
+                return (white - black) * 100;
+            }
+            
+            if (isMaximizing) {
+                let maxEval = -Infinity;
+                for (const m of moves.slice(0, 4)) {
+                    const eval = minimax(m, depth - 1, alpha, beta, false);
+                    maxEval = Math.max(maxEval, eval);
+                    alpha = Math.max(alpha, eval);
+                    if (beta <= alpha) break;
+                }
+                board = tempBoard;
+                return maxEval;
+            } else {
+                let minEval = Infinity;
+                for (const m of moves.slice(0, 4)) {
+                    const eval = minimax(m, depth - 1, alpha, beta, true);
+                    minEval = Math.min(minEval, eval);
+                    beta = Math.min(beta, eval);
+                    if (beta <= alpha) break;
+                }
+                board = tempBoard;
+                return minEval;
+            }
+        }
+        
+        function evaluateBoard(player) {
+            let score = 0;
+            const opponent = player === 1 ? 2 : 1;
+            
+            // Corner positions
+            const corners = [[0,0], [0,7], [7,0], [7,7]];
+            for (const [r, c] of corners) {
+                if (board[r][c] === player) score += 100;
+                else if (board[r][c] === opponent) score -= 100;
+            }
+            
+            // Edge positions
+            for (let i = 1; i < 7; i++) {
+                if (board[0][i] === player) score += 20;
+                else if (board[0][i] === opponent) score -= 20;
+                if (board[7][i] === player) score += 20;
+                else if (board[7][i] === opponent) score -= 20;
+                if (board[i][0] === player) score += 20;
+                else if (board[i][0] === opponent) score -= 20;
+                if (board[i][7] === player) score += 20;
+                else if (board[i][7] === opponent) score -= 20;
+            }
+            
+            // Piece count
+            const playerCount = board.flat().filter(c => c === player).length;
+            const opponentCount = board.flat().filter(c => c === opponent).length;
+            score += (playerCount - opponentCount) * 5;
+            
+            return score;
+        }
+        
+        function checkWin(player) {
+            if (getValidMoves(player).length > 0) return false;
+            const opponent = player === 1 ? 2 : 1;
+            if (getValidMoves(opponent).length > 0) return false;
+            
+            const black = board.flat().filter(c => c === 1).length;
+            const white = board.flat().filter(c => c === 2).length;
+            
+            if (player === 1) return black > white;
+            return white > black;
         }
         
         function newGame() {
