@@ -208,7 +208,7 @@
             <div class="grid">
                 <div class="stat-item">
                     <div class="stat-label">Token 使用量</div>
-                    <div class="stat-value" id="tokenUsage">--</div>
+                    <div class="stat-value" id="tokenUsage">0%</div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="tokenProgress" style="width: 0%"></div>
                     </div>
@@ -313,7 +313,7 @@
             const maxTokens = 150000;
             const tokenPercent = Math.min((tokens / maxTokens) * 100, 100);
             
-            document.getElementById('tokenUsage').textContent = tokens.toLocaleString();
+            document.getElementById('tokenUsage').textContent = tokenPercent.toFixed(1) + '%';
             const tokenProgress = document.getElementById('tokenProgress');
             tokenProgress.style.width = tokenPercent + '%';
             tokenProgress.className = 'progress-fill ' + (tokenPercent < 50 ? 'low' : tokenPercent < 80 ? 'medium' : 'high');
