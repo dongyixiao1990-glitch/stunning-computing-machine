@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>连连看 - 冰箱食物版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { color: #2e7d32; margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 20px; }
+        .info-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .info-bar span { color: #2e7d32; font-weight: bold; }
+        .game-container {
+            display: flex;
+            gap: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 45px);
+            grid-template-rows: repeat(8, 45px);
+            gap: 3px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .cell {
+            width: 45px; height: 45px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .cell:hover { transform: scale(1.1); }
+        .cell.selected { border-color: #f39c12; background: #fff8e1; }
+        .cell.matched { opacity: 0; pointer-events: none; }
+        .cell.empty { background: transparent; cursor: default; }
+        
+        .foods { display: none; }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .hint-btn, .shuffle-btn {
+            padding: 15px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .hint-btn { background: #ff9800; color: white; }
+        .shuffle-btn { background: #4caf50; color: white; }
+        .hint-btn:hover, .shuffle-btn:hover { transform: scale(1.05); }
+        
+        .selected-info {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-height: 80px;
+        }
+        .selected-info .icon { font-size: 40px; }
+        
+        .line-canvas {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .level-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .level-btn {
+            padding: 8px 20px;
+            border: 2px solid #2e7d32;
+            background: transparent;
+            color: #2e7d32;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .level-btn.active { background: #2e7d32; color: white; }
+        
+        .back-link {
+            position: fixed;
+            top: 20px; left: 20px;
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { color: #1b5e20; }
+        
+        .success-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .success-modal.show { display: block; }
+        .success-modal h2 { color: #2e7d32; font-size: 2rem; }
+        .success-modal button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html#games" class="back-link">← 返回作品集</a>
+    <h1>🧊 冰箱连连看</h1>
+    <p class="subtitle">找出相同的食物并连接消除</p>
+    
+    <div class="level-select">
+        <button class="level-btn" onclick="setLevel(8, 6)">简单 8×6</button>
+        <button class="level-btn active" onclick="setLevel(10, 8)">中等 10×8</button>
+        <button class="level-btn" onclick="setLevel(12, 10)">困难 12×10</button>
+    </div>
+    
+    <div class="info-bar">
+        <div>剩余: <span id="remaining">0</span> 对</div>
+        <div>用时: <span id="time">0:00</span></div>
+    </div>
+    
+    <div class="game-container">
+        <div style="position:relative">
+            <div class="board" id="board"></div>
+        </div>
+        <div class="sidebar">
+            <div class="selected-info">
+                <div class="icon" id="selectedIcon">❓</div>
+                <div id="selectedName">选择食物</div>
+            </div>
+            <button class="hint-btn" onclick="showHint()">💡 提示</button>
+            <button class="shuffle-btn" onclick="shuffleBoard()">🔀 洗牌</button>
+        </div>
+    </div>
+    
+    <div class="success-modal" id="success">
+        <h2>🎉 恭喜通关!</h2>
+        <p>用时: <span id="finalTime"></span></p>
+        <button onclick="newGame()">再玩一次</button>
+    </div>
+
+    <script>
+        // 冰箱食物图标
+        const foods = [
+            { icon: '🥛', name: '牛奶' },
+            { icon: '🧈', name: '黄油' },
+            { icon: '🥛', name: '酸奶' },
+            { icon: '🧀', name: '奶酪' },
+            { icon: '🥚', name: '鸡蛋' },
+            { icon: '🥬', name: '生菜' },
+            { icon: '🍅', name: '番茄' },
+            { icon: '🥒', name: '黄瓜' },
+            { icon: '🍌', name: '香蕉' },
+            { icon: '🍎', name: '苹果' },
+            { icon: '🍊', name: '橙子' },
+            { icon: '🍇', name: '葡萄' },
+            { icon: '🥕', name: '胡萝卜' },
+            { icon: '🌽', name: '玉米' },
+            { icon: '🥦', name: '西兰花' },
+            { icon: '🍗', name: '鸡肉' },
+            { icon: '🥩', name: '牛肉' },
+            { icon: '🐟', name: '鱼肉' },
+            { icon: '🍞', name: '面包' },
+            { icon: '🍰', name: '蛋糕' },
+        ];
+        
+        let cols = 10, rows = 8;
+        let board = [];
+        let selected = null;
+        let matched = [];
+        let timer = 0, timerInterval = null;
+        
+        function setLevel(c, r) {
+            cols = c; rows = r;
+            document.querySelectorAll('.level-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === [8,10,12].indexOf(c));
+            });
+            newGame();
+        }
+        
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        
+        function initBoard() {
+            const totalCells = cols * rows;
+            const pairs = Math.floor(totalCells / 2);
+            let tiles = [];
+            
+            for (let i = 0; i < pairs; i++) {
+                const food = foods[i % foods.length];
+                tiles.push({ ...food, id: i });
+                tiles.push({ ...food, id: i });
+            }
+            
+            tiles = shuffleArray(tiles);
+            board = [];
+            for (let r = 0; r < rows; r++) {
+                board[r] = [];
+                for (let c = 0; c < cols; c++) {
+                    board[r][c] = tiles[r * cols + c] || null;
+                }
+            }
+        }
+        
+        function render() {
+            const boardEl = document.getElementById('board');
+            boardEl.style.gridTemplateColumns = `repeat(${cols}, 45px)`;
+            boardEl.style.gridTemplateRows = `repeat(${rows}, 45px)`;
+            boardEl.innerHTML = '';
+            
+            let remaining = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    const tile = board[r][c];
+                    
+                    if (!tile) {
+                        cell.className = 'cell empty';
+                    } else {
+                        remaining++;
+                        cell.className = 'cell';
+                        cell.textContent = tile.icon;
+                        
+                        if (selected && selected.r === r && selected.c === c) {
+                            cell.classList.add('selected');
+                        }
+                        
+                        cell.onclick = () => handleClick(r, c);
+                    }
+                    boardEl.appendChild(cell);
+                }
+            }
+            
+            document.getElementById('remaining').textContent = remaining / 2;
+        }
+        
+        function handleClick(r, c) {
+            const tile = board[r][c];
+            if (!tile) return;
+            
+            if (!selected) {
+                selected = { r, c, tile };
+                document.getElementById('selectedIcon').textContent = tile.icon;
+                document.getElementById('selectedName').textContent = tile.name;
+            } else if (selected.r === r && selected.c === c) {
+                selected = null;
+                document.getElementById('selectedIcon').textContent = '❓';
+                document.getElementById('selectedName').textContent = '选择食物';
+            } else if (selected.tile.id === tile.id) {
+                // 检查是否可连接
+                if (canConnect(selected.r, selected.c, r, c)) {
+                    // 消除
+                    board[selected.r][selected.c] = null;
+                    board[r][c] = null;
+                    selected = null;
+                    document.getElementById('selectedIcon').textContent = '❓';
+                    document.getElementById('selectedName').textContent = '选择食物';
+                    
+                    render();
+                    checkWin();
+                } else {
+                    selected = { r, c, tile };
+                    document.getElementById('selectedIcon').textContent = tile.icon;
+                    document.getElementById('selectedName').textContent = tile.name;
+                }
+            } else {
+                selected = { r, c, tile };
+                document.getElementById('selectedIcon').textContent = tile.icon;
+                document.getElementById('selectedName').textContent = tile.name;
+            }
+            render();
+        }
+        
+        function canConnect(r1, c1, r2, c2) {
+            // 检查是否能通过不超过2个拐点连接
+            // 1. 直线连接
+            if (checkLine(r1, c1, r2, c2)) return true;
+            // 2. 一个拐点
+            if (checkOneCorner(r1, c1, r2, c2)) return true;
+            // 3. 两个拐点
+            if (checkTwoCorners(r1, c1, r2, c2)) return true;
+            return false;
+        }
+        
+        function isEmpty(r, c) {
+            return r < 0 || r >= rows || c < 0 || c >= cols || board[r][c] === null;
+        }
+        
+        function checkLine(r1, c1, r2, c2) {
+            if (r1 === r2) {
+                const minC = Math.min(c1, c2), maxC = Math.max(c1, c2);
+                for (let c = minC + 1; c < maxC; c++) {
+                    if (!isEmpty(r1, c)) return false;
+                }
+                return true;
+            }
+            if (c1 === c2) {
+                const minR = Math.min(r1, r2), maxR = Math.max(r1, r2);
+                for (let r = minR + 1; r < maxR; r++) {
+                    if (!isEmpty(r, c1)) return false;
+                }
+                return true;
+            }
+            return false;
+        }
+        
+        function checkOneCorner(r1, c1, r2, c2) {
+            // c1, r2
+            if (isEmpty(r1, c2) && checkLine(r1, c1, r1, c2) && checkLine(r1, c2, r2, c2)) return true;
+            // r1, c2
+            if (isEmpty(r2, c1) && checkLine(r1, c1, r2, c1) && checkLine(r2, c1, r2, c2)) return true;
+            return false;
+        }
+        
+        function checkTwoCorners(r1, c1, r2, c2) {
+            // 遍历所有可能的中间点
+            for (let r = -1; r <= rows; r++) {
+                if (isEmpty(r, c1) && checkLine(r1, c1, r, c1) && isEmpty(r, c2) && checkLine(r, c1, r, c2) && checkLine(r, c2, r2, c2)) return true;
+            }
+            for (let c = -1; c <= cols; c++) {
+                if (isEmpty(r1, c) && checkLine(r1, c1, r1, c) && isEmpty(r2, c) && checkLine(r1, c, r2, c) && checkLine(r2, c, r2, c2)) return true;
+            }
+            return false;
+        }
+        
+        function showHint() {
+            // 简单提示：找到第一对可消除的
+            let tiles = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (board[r][c]) tiles.push({r, c, tile: board[r][c]});
+                }
+            }
+            
+            for (let i = 0; i < tiles.length; i++) {
+                for (let j = i + 1; j < tiles.length; j++) {
+                    if (tiles[i].tile.id === tiles[j].tile.id) {
+                        if (canConnect(tiles[i].r, tiles[i].c, tiles[j].r, tiles[j].c)) {
+                            // 高亮显示
+                            selected = tiles[i];
+                            handleClick(tiles[j].r, tiles[j].c);
+                            return;
+                        }
+                    }
+                }
+            }
+            shuffleBoard();
+        }
+        
+        function shuffleBoard() {
+            let tiles = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (board[r][c]) tiles.push(board[r][c]);
+                }
+            }
+            tiles = shuffleArray(tiles);
+            
+            let idx = 0;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (board[r][c]) {
+                        board[r][c] = tiles[idx++];
+                    }
+                }
+            }
+            selected = null;
+            render();
+        }
+        
+        function checkWin() {
+            const remaining = board.flat().filter(t => t !== null).length;
+            if (remaining === 0) {
+                clearInterval(timerInterval);
+                document.getElementById('finalTime').textContent = document.getElementById('time').textContent;
+                document.getElementById('success').classList.add('show');
+            }
+        }
+        
+        function startTimer() {
+            timer = 0;
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer++;
+                const min = Math.floor(timer / 60);
+                const sec = timer % 60;
+                document.getElementById('time').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function newGame() {
+            document.getElementById('success').classList.remove('show');
+            selected = null;
+            initBoard();
+            render();
+            startTimer();
+        }
+        
+        newGame();
+    </script>
+</body>
+</html>

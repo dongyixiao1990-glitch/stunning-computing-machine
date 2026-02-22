@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消消乐 - 水果版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { color: #e65100; margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 15px; }
+        
+        .info-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .info-bar span { color: #e65100; font-weight: bold; }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            gap: 5px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .cell {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #f5f5f5, #eee);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .cell:hover { transform: scale(1.1); }
+        .cell.selected {
+            animation: pulse 0.5s infinite;
+            box-shadow: 0 0 15px #ff9800;
+        }
+        .cell.matched {
+            animation: pop 0.3s forwards;
+        }
+        .cell.dropping {
+            animation: drop 0.3s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        @keyframes drop {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .hint-btn { background: #ff9800; color: white; }
+        .new-btn { background: #4caf50; color: white; }
+        button:hover { transform: scale(1.05); }
+        
+        .score-popup {
+            position: fixed;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff9800;
+            pointer-events: none;
+            animation: floatUp 1s forwards;
+            z-index: 100;
+        }
+        
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+        
+        .back-link {
+            position: fixed;
+            top: 20px; left: 20px;
+            color: #e65100;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .level-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .level-btn {
+            padding: 8px 20px;
+            border: 2px solid #e65100;
+            background: transparent;
+            color: #e65100;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .level-btn.active { background: #e65100; color: white; }
+        
+        .target-score {
+            background: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html#games" class="back-link">← 返回作品集</a>
+    <h1>🍎 水果消消乐</h1>
+    <p class="subtitle">交换相邻水果，三个相同即可消除</p>
+    
+    <div class="level-select">
+        <button class="level-btn" onclick="setLevel(6)">简单</button>
+        <button class="level-btn active" onclick="setLevel(8)">中等</button>
+        <button class="level-btn" onclick="setLevel(10)">困难</button>
+    </div>
+    
+    <div class="target-score">
+        目标分数: <span id="target">1000</span> | 当前: <span id="score">0</span>
+    </div>
+    
+    <div class="info-bar">
+        <div>步数: <span id="moves">0</span></div>
+        <div>连击: <span id="combo">0</span>x</div>
+    </div>
+    
+    <div class="game-board" id="board"></div>
+    
+    <div class="controls">
+        <button class="new-btn" onclick="newGame()">🎮 新游戏</button>
+    </div>
+
+    <script>
+        const fruits = ['🍎', '🍊', '🍇', '🍌', '🥝', '🍓', '🍑', '🍒'];
+        
+        let size = 8;
+        let grid = [];
+        let selected = null;
+        let score = 0;
+        let moves = 0;
+        let combo = 0;
+        let isProcessing = false;
+        let targetScore = 1000;
+        
+        function setLevel(s) {
+            size = s;
+            targetScore = s * s * 20;
+            document.querySelectorAll('.level-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', [6, 8, 10].indexOf(s) === i);
+            });
+            newGame();
+        }
+        
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        
+        function initGrid() {
+            grid = [];
+            for (let r = 0; r < size; r++) {
+                grid[r] = [];
+                for (let c = 0; c < size; c++) {
+                    let fruit;
+                    do {
+                        fruit = fruits[Math.floor(Math.random() * fruits.length)];
+                    } while (wouldMatch(r, c, fruit));
+                    grid[r][c] = fruit;
+                }
+            }
+        }
+        
+        function wouldMatch(r, c, fruit) {
+            // Check horizontal
+            if (c >= 2 && grid[r][c-1] === fruit && grid[r][c-2] === fruit) return true;
+            // Check vertical
+            if (r >= 2 && grid[r-1][c] === fruit && grid[r-2][c] === fruit) return true;
+            return false;
+        }
+        
+        function render() {
+            const board = document.getElementById('board');
+            board.style.gridTemplateColumns = `repeat(${size}, 50px)`;
+            board.innerHTML = '';
+            
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.textContent = grid[r][c];
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    
+                    if (selected && selected.r === r && selected.c === c) {
+                        cell.classList.add('selected');
+                    }
+                    
+                    cell.onclick = () => handleClick(r, c);
+                    board.appendChild(cell);
+                }
+            }
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('target').textContent = targetScore;
+            document.getElementById('combo').textContent = combo;
+        }
+        
+        function handleClick(r, c) {
+            if (isProcessing) return;
+            
+            if (!selected) {
+                selected = { r, c };
+            } else {
+                const r1 = selected.r, c1 = selected.c;
+                const r2 = r, c2 = c;
+                
+                // Check if adjacent
+                const isAdjacent = Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+                
+                if (isAdjacent) {
+                    // Swap
+                    [grid[r1][c1], grid[r2][c2]] = [grid[r2][c2], grid[r1][c1]];
+                    moves++;
+                    
+                    // Check for matches
+                    const matches = findMatches();
+                    
+                    if (matches.length > 0) {
+                        selected = null;
+                        combo = 0;
+                        processMatches();
+                    } else {
+                        // Swap back
+                        [grid[r1][c1], grid[r2][c2]] = [grid[r2][c2], grid[r1][c1]];
+                        selected = { r, c };
+                    }
+                } else {
+                    selected = { r, c };
+                }
+            }
+            render();
+        }
+        
+        function findMatches() {
+            const matches = new Set();
+            
+            // Horizontal
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size - 2; c++) {
+                    const fruit = grid[r][c];
+                    if (fruit && fruit === grid[r][c+1] && fruit === grid[r][c+2]) {
+                        matches.add(`${r},${c}`);
+                        matches.add(`${r},${c+1}`);
+                        matches.add(`${r},${c+2}`);
+                    }
+                }
+            }
+            
+            // Vertical
+            for (let c = 0; c < size; c++) {
+                for (let r = 0; r < size - 2; r++) {
+                    const fruit = grid[r][c];
+                    if (fruit && fruit === grid[r+1][c] && fruit === grid[r+2][c]) {
+                        matches.add(`${r},${c}`);
+                        matches.add(`${r+1},${c}`);
+                        matches.add(`${r+2},${c}`);
+                    }
+                }
+            }
+            
+            return Array.from(matches).map(s => {
+                const [r, c] = s.split(',').map(Number);
+                return { r, c };
+            });
+        }
+        
+        async function processMatches() {
+            isProcessing = true;
+            
+            while (true) {
+                const matches = findMatches();
+                if (matches.length === 0) break;
+                
+                // Calculate score
+                combo++;
+                const points = matches.length * 10 * combo;
+                score += points;
+                showScorePopup(points);
+                
+                // Animate removal
+                const cells = document.querySelectorAll('.cell');
+                matches.forEach(({r, c}) => {
+                    const idx = r * size + c;
+                    if (cells[idx]) cells[idx].classList.add('matched');
+                });
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Remove matched
+                matches.forEach(({r, c}) => {
+                    grid[r][c] = null;
+                });
+                
+                render();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Drop
+                dropTiles();
+                render();
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Fill empty
+                fillEmpty();
+                render();
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            isProcessing = false;
+            checkWin();
+        }
+        
+        function dropTiles() {
+            for (let c = 0; c < size; c++) {
+                let emptyRow = size - 1;
+                for (let r = size - 1; r >= 0; r--) {
+                    if (grid[r][c] !== null) {
+                        if (r !== emptyRow) {
+                            grid[emptyRow][c] = grid[r][c];
+                            grid[r][c] = null;
+                        }
+                        emptyRow--;
+                    }
+                }
+            }
+        }
+        
+        function fillEmpty() {
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    if (grid[r][c] === null) {
+                        grid[r][c] = fruits[Math.floor(Math.random() * fruits.length)];
+                    }
+                }
+            }
+        }
+        
+        function showScorePopup(points) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = `+${points}`;
+            popup.style.left = '50%';
+            popup.style.top = '40%';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
+        }
+        
+        function checkWin() {
+            if (score >= targetScore) {
+                setTimeout(() => {
+                    alert(`🎉 恭喜过关!\n得分: ${score}\n步数: ${moves}`);
+                }, 300);
+            }
+        }
+        
+        function newGame() {
+            score = 0;
+            moves = 0;
+            combo = 0;
+            selected = null;
+            isProcessing = false;
+            initGrid();
+            render();
+        }
+        
+        newGame();
+    </script>
+</body>
+</html>
