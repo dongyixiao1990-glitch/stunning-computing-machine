@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Agent 状态监控</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-size: 2rem;
+        }
+        h1 span { animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .status-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-indicator.online { 
+            background: #00ff88; 
+            box-shadow: 0 0 20px #00ff88;
+            animation: blink 2s infinite;
+        }
+        .status-indicator.offline { 
+            background: #ff4444; 
+            box-shadow: 0 0 20px #ff4444;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .status-value.warning { color: #ffaa00; }
+        .status-value.error { color: #ff4444; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-item {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .progress-fill.low { background: #00ff88; }
+        .progress-fill.medium { background: #ffaa00; }
+        .progress-fill.high { background: #ff4444; }
+        
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .log-time { color: #666; }
+        .log-msg { color: #ccc; }
+        
+        .last-update {
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            margin-top: 20px;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .refresh-btn:hover { transform: scale(1.05); }
+        
+        .emoji { font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span>🤖</span> AI Agent 状态监控</h1>
+        
+        <!-- 运行状态 -->
+        <div class="status-card">
+            <div class="status-header">
+                <div class="status-title">
+                    <span class="emoji">⚡</span>
+                    运行状态
+                </div>
+                <div id="mainStatus" class="status-value">
+                    <span class="status-indicator online"></span>
+                    在线运行中
+                </div>
+            </div>
+            <div class="grid">
+                <div class="stat-item">
+                    <div class="stat-label">连接状态</div>
+                    <div class="stat-value" id="connectionStatus">正常</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最后活动时间</div>
+                    <div class="stat-value" id="lastActive">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 资源消耗 -->
+        <div class="status-card">
+            <div class="status-header">
+                <div class="status-title">
+                    <span class="emoji">📊</span>
+                    资源消耗
+                </div>
+            </div>
+            <div class="grid">
+                <div class="stat-item">
+                    <div class="stat-label">Token 使用量</div>
+                    <div class="stat-value" id="tokenUsage">--</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="tokenProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">会话时长</div>
+                    <div class="stat-value" id="sessionDuration">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">消息数量</div>
+                    <div class="stat-value" id="messageCount">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">平均响应时间</div>
+                    <div class="stat-value" id="avgResponseTime">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 系统状态 -->
+        <div class="status-card">
+            <div class="status-header">
+                <div class="status-title">
+                    <span class="emoji">💻</span>
+                    系统状态
+                </div>
+            </div>
+            <div class="grid">
+                <div class="stat-item">
+                    <div class="stat-label">CPU 使用率</div>
+                    <div class="stat-value" id="cpuUsage">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">内存使用</div>
+                    <div class="stat-value" id="memoryUsage">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">当前模型</div>
+                    <div class="stat-value" id="currentModel">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">上下文窗口</div>
+                    <div class="stat-value" id="contextWindow">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 活动日志 -->
+        <div class="status-card">
+            <div class="status-header">
+                <div class="status-title">
+                    <span class="emoji">📝</span>
+                    最近活动
+                </div>
+            </div>
+            <div class="log-container" id="activityLog">
+                <div class="log-entry">
+                    <span class="log-time">--:--:--</span>
+                    <span class="log-msg">等待数据...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="last-update" id="lastUpdate">
+            最后更新: --
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshStatus()">🔄 刷新状态</button>
+    </div>
+
+    <script>
+        // 模拟数据 - 实际使用时需要后端API支持
+        let activityLog = [];
+        
+        function getConnectionStatus() {
+            // 模拟连接状态检查
+            return Math.random() > 0.05 ? '正常' : '波动';
+        }
+        
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            if (hours > 0) {
+                return `${hours}小时 ${minutes}分钟`;
+            } else if (minutes > 0) {
+                return `${minutes}分 ${secs}秒`;
+            }
+            return `${secs}秒`;
+        }
+        
+        function updateUI(data) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            
+            // 更新运行状态
+            document.getElementById('connectionStatus').textContent = data.connectionStatus || '正常';
+            document.getElementById('lastActive').textContent = data.lastActive || timeStr;
+            
+            // 更新资源消耗
+            const tokens = data.tokens || Math.floor(Math.random() * 50000 + 10000);
+            const maxTokens = 150000;
+            const tokenPercent = Math.min((tokens / maxTokens) * 100, 100);
+            
+            document.getElementById('tokenUsage').textContent = tokens.toLocaleString();
+            const tokenProgress = document.getElementById('tokenProgress');
+            tokenProgress.style.width = tokenPercent + '%';
+            tokenProgress.className = 'progress-fill ' + (tokenPercent < 50 ? 'low' : tokenPercent < 80 ? 'medium' : 'high');
+            
+            document.getElementById('sessionDuration').textContent = formatDuration(data.sessionDuration || 1800);
+            document.getElementById('messageCount').textContent = data.messages || Math.floor(Math.random() * 50 + 10);
+            document.getElementById('avgResponseTime').textContent = (data.avgResponseTime || (Math.random() * 3 + 1)).toFixed(1) + 's';
+            
+            // 更新系统状态
+            const cpu = data.cpu || Math.floor(Math.random() * 40 + 20);
+            document.getElementById('cpuUsage').textContent = cpu + '%';
+            
+            const mem = data.memory || Math.floor(Math.random() * 30 + 40);
+            document.getElementById('memoryUsage').textContent = mem + '%';
+            
+            document.getElementById('currentModel').textContent = data.model || 'MiniMax-M2.5';
+            document.getElementById('contextWindow').textContent = '150K';
+            
+            // 添加活动日志
+            const activities = [
+                '✅ 等待用户指令...',
+                '💬 正在处理消息',
+                '🔄 检查系统状态',
+                '📊 更新监控数据',
+                '✨ 任务执行中'
+            ];
+            
+            const newActivity = activities[Math.floor(Math.random() * activities.length)];
+            activityLog.unshift({ time: timeStr, msg: newActivity });
+            if (activityLog.length > 10) activityLog.pop();
+            
+            // 渲染日志
+            const logContainer = document.getElementById('activityLog');
+            logContainer.innerHTML = activityLog.map(log => `
+                <div class="log-entry">
+                    <span class="log-time">${log.time}</span>
+                    <span class="log-msg">${log.msg}</span>
+                </div>
+            `).join('');
+            
+            // 更新时间戳
+            document.getElementById('lastUpdate').textContent = '最后更新: ' + now.toLocaleString('zh-CN');
+        }
+        
+        function refreshStatus() {
+            // 模拟API调用 - 实际需要后端
+            const mockData = {
+                connectionStatus: getConnectionStatus(),
+                lastActive: new Date().toLocaleTimeString('zh-CN'),
+                tokens: Math.floor(Math.random() * 30000 + 5000),
+                sessionDuration: 1800 + Math.floor(Math.random() * 600),
+                messages: Math.floor(Math.random() * 30 + 5),
+                avgResponseTime: Math.random() * 3 + 1,
+                cpu: Math.floor(Math.random() * 50 + 15),
+                memory: Math.floor(Math.random() * 30 + 35),
+                model: 'MiniMax-M2.5'
+            };
+            
+            updateUI(mockData);
+        }
+        
+        // 页面加载时自动刷新
+        refreshStatus();
+        
+        // 每10秒自动刷新
+        setInterval(refreshStatus, 10000);
+    </script>
+</body>
+</html>
