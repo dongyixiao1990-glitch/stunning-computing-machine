@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yixiao Dong | QA Engineer Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #f39c12; --dark: #1a1a2e; --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; line-height: 1.7; color: #333; background: #fafafa; }
+        
+        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 1001; display: flex; gap: 8px; background: rgba(255,255,255,0.95); padding: 8px 15px; border-radius: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+        .lang-btn { padding: 6px 14px; border: none; background: transparent; color: #555; font-size: 0.85rem; font-weight: 500; cursor: pointer; border-radius: 15px; transition: all 0.3s; }
+        .lang-btn:hover, .lang-btn.active { background: var(--gradient); color: white; }
+        
+        nav { position: fixed; top: 0; width: 100%; background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(10px); z-index: 1000; padding: 15px 0; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; }
+        .logo span { color: var(--gold); }
+        .nav-menu { display: flex; gap: 25px; list-style: none; }
+        .nav-menu a { color: rgba(255,255,255,0.8); text-decoration: none; font-weight: 500; font-size: 0.9rem; position: relative; display: block; text-align: center; padding: 15px 0; }
+        .nav-menu a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--gold); transition: width 0.3s; }
+        .nav-menu a:hover { color: white; }
+        .nav-menu a:hover::after { width: 100%; }
+        .mobile-menu-btn { display: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        
+        .hero { min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .hero-content { text-align: center; z-index: 1; padding: 20px; }
+        .hero-image { width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 4px solid var(--gold); box-shadow: 0 20px 60px rgba(0,0,0,0.4); margin-bottom: 30px; cursor: pointer; transition: transform 0.3s; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .hero-image:hover { transform: scale(1.05); }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: white; margin-bottom: 15px; }
+        .hero .subtitle { font-size: 1.3rem; color: rgba(255,255,255,0.7); margin-bottom: 10px; }
+        .hero .tagline { font-style: italic; color: var(--gold); font-size: 1.1rem; }
+        .scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+        
+        section { padding: 100px 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--dark); margin-bottom: 15px; }
+        .section-header .line { width: 60px; height: 3px; background: var(--gradient); margin: 0 auto; }
+        .section-header p { color: #666; max-width: 600px; margin: 20px auto 0; }
+        
+        #story { background: white; }
+        .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .story-image img { width: 100%; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .story-content h3 { font-size: 1.8rem; color: var(--dark); margin-bottom: 20px; }
+        .story-content p { color: #555; margin-bottom: 20px; }
+        .story-quote { background: #f8f9fa; padding: 25px; border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; margin: 30px 0; font-style: italic; color: #555; }
+        .story-highlights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .highlight-item { display: flex; align-items: center; gap: 15px; }
+        .highlight-icon { width: 50px; height: 50px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
+        .highlight-text h4 { font-size: 1rem; color: var(--dark); }
+        .highlight-text p { font-size: 0.9rem; color: #666; margin: 0; }
+        
+        #experience { background: #f8f9fa; }
+        .timeline { position: relative; max-width: 900px; margin: 0 auto; }
+        .timeline::before { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 3px; height: 100%; background: linear-gradient(to bottom, var(--gold), #3498db); }
+        .timeline-item { display: flex; justify-content: flex-end; padding-right: 50%; position: relative; margin-bottom: 50px; }
+        .timeline-item:nth-child(even) { justify-content: flex-start; padding-right: 0; padding-left: 50%; }
+        .timeline-content { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); width: 85%; }
+        .timeline-item:nth-child(odd) .timeline-content { margin-right: 40px; }
+        .timeline-item:nth-child(even) .timeline-content { margin-left: 40px; }
+        .timeline-dot { position: absolute; top: 30px; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; border: 4px solid white; box-shadow: 0 0 0 3px var(--gold); }
+        .timeline-item:nth-child(odd) .timeline-dot { right: -52px; }
+        .timeline-item:nth-child(even) .timeline-dot { left: -52px; }
+        .timeline-date { display: inline-block; background: var(--gradient); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; margin-bottom: 15px; }
+        .timeline-content h3 { font-size: 1.3rem; color: var(--dark); margin-bottom: 5px; }
+        .timeline-content .company { color: #3498db; font-weight: 500; margin-bottom: 15px; }
+        .timeline-content ul { padding-left: 20px; color: #555; }
+        .timeline-content li { margin-bottom: 8px; }
+        
+        #games { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        #games .section-header h2 { color: white; }
+        #games .section-header p { color: rgba(255,255,255,0.7); }
+        #games .section-header .line { background: var(--gold); }
+        .games-note { text-align: center; color: rgba(255,255,255,0.6); font-style: italic; margin-bottom: 40px; font-size: 1.1rem; }
+        .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .game-card { background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+        .games-list { display: flex; flex-direction: column; gap: 15px; max-width: 700px; margin: 0 auto; }
+        .game-item { display: flex; align-items: center; gap: 20px; background: white; padding: 20px 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+        .game-item:hover { transform: translateX(10px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        .game-icon { font-size: 2.5rem; }
+        .game-details { flex: 1; }
+        .game-details h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 5px; }
+        .game-details p { font-size: 0.9rem; color: #666; margin: 0; }
+        .game-item .game-link { padding: 10px 25px; } .game-card:hover { transform: translateY(-10px); border-color: var(--gold); }
+        
+        .game-info { padding: 25px; }
+        .game-info h3 { color: white; font-size: 1.4rem; margin-bottom: 10px; }
+        .game-info p { color: rgba(255,255,255,0.7); margin-bottom: 20px; font-size: 0.95rem; }
+        .game-link { display: inline-flex; align-items: center; gap: 10px; background: var(--gold); color: var(--dark); padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.3s; }
+        .game-link:hover { transform: translateX(5px); }
+        
+        #portfolio { background: white; }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .portfolio-item { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.08); transition: transform 0.3s; }
+        .portfolio-item:hover { transform: translateY(-8px); }
+        .portfolio-image { height: 180px; overflow: hidden; }
+        .portfolio-image img { width: 100%; height: 100%; object-fit: cover; }
+        .portfolio-content { padding: 20px; }
+        .portfolio-content h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 8px; }
+        .portfolio-content p { color: #666; font-size: 0.9rem; margin-bottom: 12px; }
+        .portfolio-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .portfolio-tag { background: #f0f0f0; color: #555; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; }
+        
+        .stats { background: var(--gradient); padding: 60px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
+        .stat-item { color: white; }
+        .stat-number { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+        
+        #contact { background: var(--dark); color: white; }
+        #contact .section-header h2 { color: white; }
+        .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 50px; }
+        .contact-info h3 { font-size: 1.3rem; margin-bottom: 25px; }
+        .contact-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .contact-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); }
+        .contact-details h4 { font-size: 1rem; margin-bottom: 3px; }
+        .contact-details p { color: rgba(255,255,255,0.7); margin: 0; font-size: 0.9rem; }
+        .social-links { display: flex; gap: 12px; margin-top: 30px; }
+        .social-link { width: 45px; height: 45px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s; }
+        .social-link:hover { background: var(--gold); }
+        
+        footer { background: #0f0f1a; color: rgba(255,255,255,0.6); padding: 25px 0; text-align: center; font-size: 0.9rem; }
+        
+        @media (max-width: 1100px) {
+            .games-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 700px) { .game-item { flex-direction: column; text-align: center; }
+            .lang-switcher { top: 70px; }
+            .nav-menu { position: fixed; top: 0; right: -100%; width: 80%; max-width: 280px; height: 100vh; background: var(--dark); flex-direction: column; justify-content: flex-start; padding-top: 80px; align-items: center; transition: right 0.3s; }
+            .nav-menu.active { right: 0; }
+            .mobile-menu-btn { display: block; z-index: 1001; }
+            .story-grid { grid-template-columns: 1fr; }
+            .timeline::before { left: 20px; }
+            .timeline-item, .timeline-item:nth-child(even) { padding-left: 50px; padding-right: 0; justify-content: flex-start; }
+            .timeline-item:nth-child(odd) .timeline-content, .timeline-item:nth-child(even) .timeline-content { margin: 0; width: 100%; }
+            .timeline-dot, .timeline-item:nth-child(odd) .timeline-dot, .timeline-item:nth-child(even) .timeline-dot { left: 11px; right: auto; }
+            .games-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .contact-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 500px) {
+            .hero h1 { font-size: 2.2rem; }
+            .section-header h2 { font-size: 1.8rem; }
+            .stat-number { font-size: 2rem; }
+            .lang-btn { padding: 5px 10px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fi">FI</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+    </div>
+
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">YIXIAO<span>.</span></a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" data-en="Home" data-fi="Koti" data-zh="首页">Home</a></li>
+                <li><a href="#story" data-en="My Story" data-fi="Tarina" data-zh="我的故事">My Story</a></li>
+                <li><a href="#experience" data-en="Experience" data-fi="Kokemus" data-zh="工作经历">Experience</a></li>
+                <li><a href="#games" data-en="Games" data-fi="Pelit" data-zh="游戏">Games</a></li>
+                <li><a href="#portfolio" data-en="Portfolio" data-fi="Portfolio" data-zh="作品集">Portfolio</a></li>
+                <li><a href="#contact" data-en="Contact" data-fi="Yhteys" data-zh="联系方式">Contact</a></li>
+            </ul>
+            <div class="mobile-menu-btn" id="menuBtn"><i class="fas fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <a href="#story"><img src="profile-photo.jpg" alt="Yixiao Dong" class="hero-image"></a>
+            <h1>Yixiao Dong</h1>
+            <p class="subtitle" data-en="Software Quality Assurance Engineer" data-fi="Ohjelmistojen laatuasiantuntija" data-zh="软件质量保证工程师">Software Quality Assurance Engineer</p>
+            <p class="tagline" data-en="Ensuring Excellence Through Precision Testing" data-fi="Erinomaista tarkkuustestauksen kautta" data-zh="通过精准测试确保卓越">Ensuring Excellence Through Precision Testing</p>
+        </div>
+        <div class="scroll-indicator"><a href="#story"><i class="fas fa-chevron-down"></i></a></div>
+    </section>
+
+    <section id="story">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="My Story" data-fi="Tarina" data-zh="我的故事">My Story</h2>
+                <div class="line"></div>
+                <p data-en="From Air Traffic Control to Quality Assurance" data-fi="Matka lentoliikenteestä laatuun" data-zh="从空中交通管制到质量保证">From Air Traffic Control to Quality Assurance</p>
+            </div>
+            <div class="story-grid">
+                <div class="story-image">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=700&fit=crop" alt="Working">
+                </div>
+                <div class="story-content">
+                    <h3 data-en="My Journey" data-fi="Matkani" data-zh="我的旅程">My Journey</h3>
+                    <p data-en="My journey into QA began with a unique foundation in Air Traffic Control from the Civil Aviation University of China. During my studies, I developed an exceptional eye for detail." data-fi="Matkani laatuun alkoi Ilmailulaitoksen parista. Opin analysoimaan yksityiskohtia." data-zh="我的质量保证之旅始于中国民用航空大学的空中交通管制专业。在学习期间，我培养了对细节的敏锐洞察力。">My journey into QA began with a unique foundation in Air Traffic Control.</p>
+                    <p data-en="After completing my MBA, I transitioned into technology, bringing my analytical mindset to software testing." data-fi="Valmistuttuani MBA:lle siirryin teknologiaan." data-zh="完成MBA后，我转型进入科技领域，将分析思维带入软件测试。">After completing my MBA, I transitioned into technology.</p>
+                    <div class="story-quote" data-en="Quality is not an act, it is a habit." data-fi="Laatu ei ole teko, se on tapa." data-zh="质量不是一种行为，而是一种习惯。">Quality is not an act, it is a habit.</div>
+                    <p data-en="With 5+ years at Applause working with Ant Group/Alipay+ and Nike, I've tested apps used by millions across APAC & EMEA." data-fi="Applausella olen testannut sovelluksia miljoonille." data-zh="在Applause与蚂蚁集团和Nike合作5年多，测试了亚太和EMEA地区数百万人使用的应用程序。">With 5+ years at Applause, I've tested apps used by millions.</p>
+                    <div class="story-highlights">
+                        <div class="highlight-item"><div class="highlight-icon"><i class="fas fa-certificate"></i></div><div class="highlight-text"><h4>ISTQB</h4><p>CTFL Certified</p></div></div>
+                        <div class="highlight-item"><div class="highlight-icon"><i class="fas fa-globe"></i></div><div class="highlight-text"><h4 data-en="15+ Countries" data-fi="15+ Maata" data-zh="15+ 国家">15+ Countries</h4><p>APAC & EMEA</p></div></div>
+                        <div class="highlight-item"><div class="highlight-icon"><i class="fas fa-bug"></i></div><div class="highlight-text"><h4>1,500+</h4><p data-en="Bugs Reported" data-fi="Virhettä" data-zh="个Bug已报告">Bugs Reported</p></div></div>
+                        <div class="highlight-item"><div class="highlight-icon"><i class="fas fa-users"></i></div><div class="highlight-text"><h4 data-en="Team Lead" data-fi="Tiiminvetäjä" data-zh="团队负责人">Team Lead</h4><p data-en="Distributed Teams" data-fi="Hajautetut tiimit" data-zh="分布式团队">Distributed Teams</p></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Work Experience" data-fi="Työkokemus" data-zh="工作经历">Work Experience</h2>
+                <div class="line"></div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item"><div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2021 - <span data-en="Present" data-fi="Nykyhetkeen" data-zh="至今">Present</span></span>
+                        <h3>Software QA Engineer</h3>
+                        <p class="company">Applause | Helsinki, Finland</p>
+                        <p style="color:#3498db;font-weight:600;margin-bottom:10px;">FinTech & Live Payment Lead (Ant Group/Alipay+)</p>
+                        <ul><li data-en="Live Payment Testing across APAC & EMEA" data-fi="Maksutestaus maailmalla" data-zh="亚太和EMEA市场支付测试">Live Payment Testing across APAC & EMEA</li><li data-en="Validated BLIK, KakaoPay and more" data-fi="Validoi paikalliset maksutavat" data-zh="验证BLIK、KakaoPay等">Validated BLIK, KakaoPay</li><li data-en="Managed assets across 6+ countries" data-fi="Hallitsi varoja 6+ maassa" data-zh="管理6个以上国家的资产">Managed assets across 6+ countries</li></ul>
+                        <p style="color:#3498db;font-weight:600;margin:15px 0 10px;">Global E-commerce (Nike)</p>
+                        <ul><li data-en="Weekly E2E regression 15+ countries" data-fi="Viikoittainen testaus 15+ maassa" data-zh="每周15个国家端到端回归测试">Weekly E2E regression 15+ countries</li><li data-en="OMOBO production verification" data-fi="OMOBO-tuotanto" data-zh="OMOBO生产验证">OMOBO production</li><li data-en="Klarna, AfterPay, Apple Pay" data-fi="Maksuintegraatiot" data-zh="Klarna、AfterPay、Apple Pay">Klarna, AfterPay, Apple Pay</li></ul>
+                    </div>
+                </div>
+                <div class="timeline-item"><div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2020 - 2021</span>
+                        <h3>QA Functional Tester</h3>
+                        <p class="company">uTest | Remote</p>
+                        <ul><li data-en="5,609+ test cases completed" data-fi="5609+ testiä" data-zh="5609多个测试用例">5,609+ test cases</li><li data-en="1,488 bugs reported" data-fi="1488 virhettä" data-zh="1488个Bug已报告">1,488 bugs reported</li><li data-en='"Favorite Tester" on 11 projects' data-fi='"Suosikkilentäjä" 11 projektissa' data-zh="11个项目上获"">Favorite Tester" on 11 projects</li></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item"><div class="stat-number">5+</div><div class="stat-label" data-en="Years" data-fi="Vuotta" data-zh="年经验">Years</div></div>
+                <div class="stat-item"><div class="stat-number">5,609+</div><div class="stat-label" data-en="Test Cases" data-fi="Testiä" data-zh="测试用例">Test Cases</div></div>
+                <div class="stat-item"><div class="stat-number">1,488</div><div class="stat-label" data-en="Bugs" data-fi="Virhettä" data-zh="个Bug">Bugs</div></div>
+                <div class="stat-item"><div class="stat-number">15+</div><div class="stat-label" data-en="Countries" data-fi="Maata" data-zh="国家">Countries</div></div>
+            </div>
+        </div>
+    </div>
+
+    <section id="games">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="My Games" data-fi="Pelini" data-zh="我的游戏">My Games</h2>
+                <div class="line"></div>
+                <p class="games-note" data-en="These are small games I created while learning Python. Hope you enjoy them!" data-fi="Nämä ovat pieniä pelejä, jotka tein Pythonia opetellessani. Toivottavasti pidät niistä!" data-zh="这些是我在学习Python时制作的小游戏。希望你喜欢！">These are small games I created while learning Python.</p>
+            </div>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-info" style="padding:0;">
+                        <h3 data-en="Gobang (Five in a Row)" data-fi="Gobang (Viisi peräkkäin)" data-zh="五子棋">Gobang (Five in a Row)</h3>
+                        <p data-en="Classic strategy game. Play against AI with 3 difficulty levels!" data-fi="Klassinen strategiapeli. Pelaa tekoälyä vastaan 3 vaikeustasolla!" data-zh="经典策略游戏。有3个难度级别，可以和AI对战！">Classic strategy game vs AI</p>
+                        <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/gobang.html" target="_blank" class="game-link"><span data-en="Play Now" data-fi="Pelaa nyt" data-zh="立即游玩">Play Now</span> <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                <div class="game-card">
+                                        <div class="game-info">
+                        <h3 data-en="Animal Chess" data-fi="Eläin Shakki" data-zh="动物棋">Animal Chess</h3>
+                        <p data-en="Traditional Chinese board game. Capture the opponent's den!" data-fi="Perinteinen kiinalainen lautapeli." data-zh="传统中国棋类游戏。占领对方兽穴！">Traditional board game</p>
+                        <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/%E5%8A%A8%E7%89%A9%E6%A3%8B.html" target="_blank" class="game-link"><span data-en="Play Now" data-fi="Pelaa nyt" data-zh="立即游玩">Play Now</span> <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                <div class="game-card">
+                                        <div class="game-info">
+                        <h3 data-en="Reversi (Othello)" data-fi="Reversi" data-zh="黑白棋">Reversi (Othello)</h3>
+                        <p data-en="Classic strategy board game. Flip opponent's discs!" data-fi="Klassinen lautapeli." data-zh="经典策略棋类游戏。翻转对方棋子！">Classic strategy game</p>
+                        <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/reversi.html" target="_blank" class="game-link"><span data-en="Play Now" data-fi="Pelaa nyt" data-zh="立即游玩">Play Now</span> <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                <div class="game-card">
+                                        <div class="game-info">
+                        <h3 data-en="Lianliankan (Fridge)" data-fi="Linkityspeli" data-zh="连连看">Lianliankan (Fridge)</h3>
+                        <p data-en="Match identical food items. Milk, butter, yogurt & more!" data-fi="Yhdistä samat ruoat." data-zh="找出相同的食物。牛奶、黄油、酸奶等！">Fridge food matching</p>
+                        <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/liangliangkan.html" target="_blank" class="game-link"><span data-en="Play Now" data-fi="Pelaa nyt" data-zh="立即游玩">Play Now</span> <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                <div class="game-card">
+                                        <div class="game-info">
+                        <h3 data-en="Match-3 (Fruits)" data-fi="Match-3" data-zh="消消乐">Match-3 (Fruits)</h3>
+                        <p data-en="Match 3 identical fruits to clear them!" data-fi="Yhdistä 3 samaa hedelmää." data-zh="三个相同水果即可消除！">Fruit matching puzzle</p>
+                        <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/xiaoxiaole.html" target="_blank" class="game-link"><span data-en="Play Now" data-fi="Pelaa nyt" data-zh="立即游玩">Play Now</span> <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Portfolio" data-fi="Portfolio" data-zh="作品集">Portfolio</h2>
+                <div class="line"></div>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-image"><img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=250&fit=crop" alt="FinTech"></div>
+                    <div class="portfolio-content">
+                        <h3>Alipay+ Live Payment</h3>
+                        <p data-en="Cross-border payment testing for Ant Group, 6+ markets." data-fi="Maksutestausta 6+ markkinalle." data-zh="蚂蚁集团跨境支付测试，6个以上市场。">Cross-border payment testing</p>
+                        <div class="portfolio-tags"><span class="portfolio-tag">FinTech</span><span class="portfolio-tag">Payments</span></div>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <div class="portfolio-image"><img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=250&fit=crop" alt="Nike"></div>
+                    <div class="portfolio-content">
+                        <h3>Nike Global E-commerce</h3>
+                        <p data-en="Weekly regression across 15+ countries." data-fi="Viikoittaista testaa." data-zh="每周15个以上国家回归测试。">Weekly regression 15+ countries</p>
+                        <div class="portfolio-tags"><span class="portfolio-tag">E-commerce</span><span class="portfolio-tag">Regression</span></div>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <div class="portfolio-image"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop" alt="Payment"></div>
+                    <div class="portfolio-content">
+                        <h3>Payment Integration</h3>
+                        <p data-en="Klarna, AfterPay, Apple Pay validation." data-fi="Maksuintegraatioita." data-zh="Klarna、AfterPay、Apple Pay验证。">Klarna, AfterPay, Apple Pay</p>
+                        <div class="portfolio-tags"><span class="portfolio-tag">Payments</span><span class="portfolio-tag">Integration</span></div>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <div class="portfolio-image"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop" alt="GitHub"></div>
+                    <div class="portfolio-content">
+                        <h3>GitHub Projects</h3>
+                        <p data-en="My code repositories and automation scripts." data-fi="Koodirepositorioitani." data-zh="我的代码库和自动化脚本。">Code repositories</p>
+                        <div class="portfolio-tags"><span class="portfolio-tag">Python</span><span class="portfolio-tag">Automation</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Get In Touch" data-fi="Ota yhteyttä" data-zh="联系我">Get In Touch</h2>
+                <div class="line"></div>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3 data-en="Contact Information" data-fi="Yhteystiedot" data-zh="联系信息">Contact Information</h3>
+                    <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone"></i></div><div class="contact-details"><h4>Phone</h4><p>+358 415769844</p></div></div>
+                    <div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><div class="contact-details"><h4>Email</h4><p>dongyixiao1990@gmail.com</p></div></div>
+                    <div class="contact-item"><div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div><div class="contact-details"><h4 data-en="Location" data-fi="Sijainti" data-zh="位置">Location</h4><p>Forssa, Finland</p></div></div>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/yixiao-dong-98b056294/" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://github.com/dongyixiao1990" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer        <div class="container">
+            <p>© 2026 Yixiao Dong. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {},
+            fi: {},
+            zh: {}
+        };
+
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const lang = this.dataset.lang;
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                switchLanguage(lang);
+            });
+        });
+
+        function switchLanguage(lang) {
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.textContent = el.dataset[lang];
+                }
+            });
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const navMenu = document.getElementById('navMenu');
+        
+        menuBtn.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            menuBtn.innerHTML = navMenu.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            });
+        });
+    </script>
+</body>
+</html>
