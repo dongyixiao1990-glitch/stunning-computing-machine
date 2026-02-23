@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 400" width="150" height="400">
+  <!-- MYLLÄRI Vertical Text for Fusion360 Import -->
+  <g fill="#000000" font-family="Arial Black" font-weight="bold" font-size="45">
+    <text x="75" y="55" text-anchor="middle">M</text>
+    <text x="75" y="110" text-anchor="middle">Y</text>
+    <text x="75" y="165" text-anchor="middle">L</text>
+    <text x="75" y="220" text-anchor="middle">L</text>
+    <text x="75" y="275" text-anchor="middle">Ä</text>
+    <text x="75" y="330" text-anchor="middle">R</text>
+    <text x="75" y="385" text-anchor="middle">I</text>
+  </g>
+</svg>
