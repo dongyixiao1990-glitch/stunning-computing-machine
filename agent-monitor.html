@@ -67,17 +67,42 @@
             background: rgba(0,0,0,0.3);
             border-radius: 12px;
             padding: 15px;
-            cursor: grab;
             transition: all 0.2s;
             border: 2px solid transparent;
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         
         .task-item:hover { border-color: rgba(255,255,255,0.2); }
-        .task-item.dragging { opacity: 0.5; transform: scale(0.98); }
-        .task-item.drag-over { border-color: #00ff88; }
         
-        .task-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0,255,136,0.3);
+        }
+        
+        .task-item.drag-over {
+            border-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+        
+        .task-item .drag-handle {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.4);
+            font-size: 20px;
+            cursor: grab;
+            padding: 5px;
+        }
+        
+        .task-item .drag-handle:active { cursor: grabbing; }
+        
+        .task-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-left: 25px; }
         
         .task-number {
             width: 28px;
@@ -93,7 +118,7 @@
         
         .task-name { font-weight: 600; font-size: 1rem; }
         
-        .task-progress { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+        .task-progress { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding-left: 25px; }
         
         .progress-bar-container {
             flex: 1;
@@ -185,6 +210,8 @@
         
         @media (max-width: 600px) {
             .grid, .action-grid { grid-template-columns: 1fr; }
+            .task-item { padding: 12px; }
+            .task-header, .task-progress { padding-left: 30px; }
         }
     </style>
 </head>
@@ -335,6 +362,8 @@
         
         let activityLog = [];
         let draggedItem = null;
+        let dragStartY = 0;
+        let dragStartIndex = -1;
         
         // ===== 渲染任务列表 =====
         function renderTasks() {
@@ -349,7 +378,8 @@
             taskList.innerHTML = tasks.map((task, index) => {
                 const progressColor = task.progress < 30 ? '#00ff88' : task.progress < 70 ? '#ffaa00' : '#ff6b6b';
                 return `
-                    <div class="task-item" draggable="true" data-id="${task.id}" data-index="${index}">
+                    <div class="task-item" data-id="${task.id}" data-index="${index}">
+                        <div class="drag-handle">☰</div>
                         <div class="task-header">
                             <div class="task-number">${index + 1}</div>
                             <div class="task-name">${task.name}</div>
@@ -364,67 +394,176 @@
                 `;
             }).join('');
             
-            // 添加拖拽事件
-            addDragEvents();
+            // 添加拖拽事件监听
+            initDragAndDrop();
             updateTotalProgress();
         }
         
         // ===== 拖拽功能 =====
-        function addDragEvents() {
+        function initDragAndDrop() {
             const items = document.querySelectorAll('.task-item');
             
             items.forEach(item => {
-                item.addEventListener('dragstart', handleDragStart);
-                item.addEventListener('dragend', handleDragEnd);
-                item.addEventListener('dragover', handleDragOver);
-                item.addEventListener('drop', handleDrop);
-                item.addEventListener('dragenter', handleDragEnter);
-                item.addEventListener('dragleave', handleDragLeave);
+                // Mouse events
+                item.addEventListener('mousedown', handleDragStart);
+                item.addEventListener('mousemove', handleDragMove);
+                item.addEventListener('mouseup', handleDragEnd);
+                item.addEventListener('mouseleave', handleDragEnd);
+                
+                // Touch events for mobile
+                item.addEventListener('touchstart', handleTouchStart, { passive: false });
+                item.addEventListener('touchmove', handleTouchMove, { passive: false });
+                item.addEventListener('touchend', handleTouchEnd);
             });
+            
+            // Global mouse move and up
+            document.addEventListener('mousemove', handleGlobalMove);
+            document.addEventListener('mouseup', handleGlobalEnd);
         }
         
         function handleDragStart(e) {
-            draggedItem = this;
-            this.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        }
-        
-        function handleDragEnd(e) {
-            this.classList.remove('dragging');
-            document.querySelectorAll('.task-item').forEach(item => {
-                item.classList.remove('drag-over');
-            });
-            draggedItem = null;
-        }
-        
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        }
-        
-        function handleDragEnter(e) {
-            e.preventDefault();
-            if (this !== draggedItem) {
-                this.classList.add('drag-over');
+            if (e.target.classList.contains('drag-handle') || e.target.closest('.drag-handle')) {
+                draggedItem = this;
+                dragStartIndex = parseInt(this.dataset.index);
+                dragStartY = e.clientY;
+                this.classList.add('dragging');
+                e.preventDefault();
             }
         }
         
-        function handleDragLeave(e) {
-            this.classList.remove('drag-over');
+        function handleDragMove(e) {
+            if (!draggedItem) return;
+            
+            const currentY = e.clientY;
+            const items = document.querySelectorAll('.task-item');
+            const draggedRect = draggedItem.getBoundingClientRect();
+            
+            items.forEach(item => {
+                if (item === draggedItem) return;
+                
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                
+                if (currentY > rect.top && currentY < rect.bottom) {
+                    if (currentY < midY) {
+                        item.classList.add('drag-over');
+                    } else {
+                        item.classList.add('drag-over');
+                    }
+                } else {
+                    item.classList.remove('drag-over');
+                }
+            });
         }
         
-        function handleDrop(e) {
-            e.preventDefault();
-            if (draggedItem && this !== draggedItem) {
-                const fromIndex = parseInt(draggedItem.dataset.index);
-                const toIndex = parseInt(this.dataset.index);
+        function handleDragEnd(e) {
+            if (!draggedItem) return;
+            
+            const items = document.querySelectorAll('.task-item');
+            const currentY = e.clientY;
+            let targetIndex = -1;
+            
+            items.forEach((item, index) => {
+                if (item === draggedItem) return;
                 
+                const rect = item.getBoundingClientRect();
+                if (currentY > rect.top && currentY < rect.bottom) {
+                    targetIndex = index;
+                }
+                item.classList.remove('drag-over');
+            });
+            
+            if (targetIndex !== -1 && targetIndex !== dragStartIndex) {
                 // 交换任务顺序
-                const [movedTask] = tasks.splice(fromIndex, 1);
-                tasks.splice(toIndex, 0, movedTask);
+                const [movedTask] = tasks.splice(dragStartIndex, 1);
+                tasks.splice(targetIndex, 0, movedTask);
+                showNotification('✓ 任务顺序已更新', 'success');
+            }
+            
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+            }
+            draggedItem = null;
+            dragStartIndex = -1;
+            
+            renderTasks();
+        }
+        
+        // Touch events for mobile
+        function handleTouchStart(e) {
+            if (e.target.classList.contains('drag-handle') || e.target.closest('.drag-handle')) {
+                draggedItem = this;
+                dragStartIndex = parseInt(this.dataset.index);
+                const touch = e.touches[0];
+                dragStartY = touch.clientY;
+                this.classList.add('dragging');
+                e.preventDefault();
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (!draggedItem) return;
+            
+            const touch = e.touches[0];
+            const currentY = touch.clientY;
+            
+            const items = document.querySelectorAll('.task-item');
+            items.forEach(item => {
+                if (item === draggedItem) return;
                 
-                renderTasks();
-                showNotification('任务顺序已更新', 'success');
+                const rect = item.getBoundingClientRect();
+                if (currentY > rect.top && currentY < rect.bottom) {
+                    item.classList.add('drag-over');
+                } else {
+                    item.classList.remove('drag-over');
+                }
+            });
+            
+            e.preventDefault();
+        }
+        
+        function handleTouchEnd(e) {
+            if (!draggedItem) return;
+            
+            const touch = e.changedTouches[0];
+            const currentY = touch.clientY;
+            let targetIndex = -1;
+            
+            const items = document.querySelectorAll('.task-item');
+            items.forEach((item, index) => {
+                if (item === draggedItem) return;
+                
+                const rect = item.getBoundingClientRect();
+                if (currentY > rect.top && currentY < rect.bottom) {
+                    targetIndex = index;
+                }
+                item.classList.remove('drag-over');
+            });
+            
+            if (targetIndex !== -1 && targetIndex !== dragStartIndex) {
+                const [movedTask] = tasks.splice(dragStartIndex, 1);
+                tasks.splice(targetIndex, 0, movedTask);
+                showNotification('✓ 任务顺序已更新', 'success');
+            }
+            
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+            }
+            draggedItem = null;
+            dragStartIndex = -1;
+            
+            renderTasks();
+        }
+        
+        function handleGlobalMove(e) {
+            if (draggedItem) {
+                handleDragMove(e);
+            }
+        }
+        
+        function handleGlobalEnd(e) {
+            if (draggedItem) {
+                handleDragEnd(e);
             }
         }
         
@@ -464,7 +603,6 @@
         // ===== 操作按钮功能 =====
         function compressContext() {
             showNotification('📦 正在压缩上下文...', 'info');
-            // 模拟操作
             setTimeout(() => {
                 showNotification('✅ 上下文压缩完成', 'success');
                 addLog('📦 上下文已压缩');
@@ -541,7 +679,6 @@
             
             renderTasks();
             
-            // 更新日志
             const activities = [
                 '✅ 等待用户指令...',
                 '💬 正在处理消息',
