@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📄 文档格式转换器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 30px 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 { 
+            text-align: center; 
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .back-btn { text-align: center; margin-bottom: 20px; }
+        .back-btn a { 
+            display: inline-block; 
+            padding: 8px 20px; 
+            background: rgba(255,255,255,0.1); 
+            color: #888; 
+            text-decoration: none; 
+            border-radius: 20px; 
+            font-size: 0.9rem; 
+        }
+        .back-btn a:hover { background: rgba(102,126,234,0.2); color: #667eea; }
+        
+        .intro { 
+            text-align: center; 
+            color: rgba(255,255,255,0.7); 
+            margin-bottom: 30px; 
+        }
+        
+        /* Categories */
+        .category {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .category h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category h2 span { font-size: 1.5rem; }
+        
+        /* Converter Grid */
+        .converter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .converter-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .converter-item:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            background: rgba(102,126,234,0.1);
+        }
+        
+        .converter-item .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .converter-item .from {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .converter-item .arrow {
+            color: rgba(255,255,255,0.5);
+            font-size: 1.2rem;
+            margin: 5px 0;
+        }
+        
+        .converter-item .to {
+            color: #764ba2;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .converter-item .service {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 8px;
+        }
+        
+        /* Quick Links */
+        .quick-links {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .quick-links h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .link-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .link-item a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        .link-item a:hover { color: #667eea; }
+        
+        footer { 
+            text-align: center; 
+            padding: 30px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 0.85rem; 
+        }
+        
+        @media (max-width: 600px) {
+            .converter-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📄 文档格式转换器</h1>
+        
+        <div class="back-btn">
+            <a href="index.html">← 返回主页</a>
+        </div>
+        
+        <p class="intro">免费的在线文档格式转换工具集合</p>
+        
+        <!-- PDF 转换 -->
+        <div class="category">
+            <h2><span>📕</span> PDF 转换</h2>
+            <div class="converter-grid">
+                <a href="https://www.ilovepdf.com/zh-cn/pdf_to_word" target="_blank" class="converter-item">
+                    <div class="icon">📄</div>
+                    <div class="from">PDF</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">Word</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+                
+                <a href="https://www.ilovepdf.com/zh-cn/pdf_to_excel" target="_blank" class="converter-item">
+                    <div class="icon">📊</div>
+                    <div class="from">PDF</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">Excel</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+                
+                <a href="https://www.ilovepdf.com/zh-cn/pdf_to_powerpoint" target="_blank" class="converter-item">
+                    <div class="icon">📽️</div>
+                    <div class="from">PDF</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">PPT</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+                
+                <a href="https://www.ilovepdf.com/zh-cn/pdf_to_jpg" target="_blank" class="converter-item">
+                    <div class="icon">🖼️</div>
+                    <div class="from">PDF</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">JPG</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Word 转换 -->
+        <div class="category">
+            <h2><span>📝</span> Word 转换</h2>
+            <div class="converter-grid">
+                <a href="https://www.ilovepdf.com/zh-cn/word_to_pdf" target="_blank" class="converter-item">
+                    <div class="icon">📕</div>
+                    <div class="from">Word</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">PDF</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+                
+                <a href="https://convertio.co/zh/doc-docx/" target="_blank" class="converter-item">
+                    <div class="icon">📄</div>
+                    <div class="from">DOC</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">DOCX</div>
+                    <div class="service">Convertio</div>
+                </a>
+                
+                <a href="https://www.word-to-pdf.com/" target="_blank" class="converter-item">
+                    <div class="icon">📄</div>
+                    <div class="from">DOCX</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">DOC</div>
+                    <div class="service">WordToPDF</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 图片转换 -->
+        <div class="category">
+            <h2><span>🖼️</span> 图片转换</h2>
+            <div class="converter-grid">
+                <a href="https://www.iloveimg.com/zh-cn/compress-image" target="_blank" class="converter-item">
+                    <div class="icon">📉</div>
+                    <div class="from">图片</div>
+                    <div class="arrow">→</div>
+                    <div class="to">压缩</div>
+                    <div class="service">iloveimg</div>
+                </a>
+                
+                <a href="https://www.iloveimg.com/zh-cn/crop-image" target="_blank" class="converter-item">
+                    <div class="icon">✂️</div>
+                    <div class="from">图片</div>
+                    <div class="arrow">→</div>
+                    <div class="to">裁剪</div>
+                    <div class="service">iloveimg</div>
+                </a>
+                
+                <a href="https://convertio.co/zh/png-jpg/" target="_blank" class="converter-item">
+                    <div class="icon">🔄</div>
+                    <div class="from">PNG</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">JPG</div>
+                    <div class="service">Convertio</div>
+                </a>
+                
+                <a href="https://www.iloveimg.com/zh-cn/resize-image" target="_blank" class="converter-item">
+                    <div class="icon">📐</div>
+                    <div class="from">图片</div>
+                    <div class="arrow">→</div>
+                    <div class="to">调整尺寸</div>
+                    <div class="service">iloveimg</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Excel 转换 -->
+        <div class="category">
+            <h2><span>📊</span> Excel 转换</h2>
+            <div class="converter-grid">
+                <a href="https://www.ilovepdf.com/zh-cn/excel_to_pdf" target="_blank" class="converter-item">
+                    <div class="icon">📕</div>
+                    <div class="from">Excel</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">PDF</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+                
+                <a href="https://www.ilovepdf.com/zh-cn/pdf_to_excel" target="_blank" class="converter-item">
+                    <div class="icon">📊</div>
+                    <div class="from">PDF</div>
+                    <div class="arrow">↓</div>
+                    <div class="to">Excel</div>
+                    <div class="service">ilovepdf</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 更多工具 -->
+        <div class="quick-links">
+            <h3>🔗 更多在线工具</h3>
+            <div class="link-grid">
+                <div class="link-item"><a href="https://www.ilovepdf.com/zh-cn" target="_blank">ilovepdf</a></div>
+                <div class="link-item"><a href="https://www.iloveimg.com/zh-cn" target="_blank">iloveimg</a></div>
+                <div class="link-item"><a href="https://convertio.co/zh/" target="_blank">Convertio</a></div>
+                <div class="link-item"><a href="https://cloudconvert.com/" target="_blank">CloudConvert</a></div>
+                <div class="link-item"><a href="https://www.zamzar.com/zh/" target="_blank">Zamzar</a></div>
+                <div class="link-item"><a href="https://onlineconvertfree.com/" target="_blank">OnlineConvert</a></div>
+            </div>
+        </div>
+        
+        <footer>📌 点击即可跳转到对应的免费在线转换服务</footer>
+    </div>
+</body>
+</html>
