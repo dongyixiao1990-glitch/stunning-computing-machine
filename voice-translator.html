@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Translator AI - 语音翻译助手</title>
+    <meta name="description" content="Voice translator with AI correction in Chinese, English, and Finnish">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #0f0f1a;
+            --secondary: #1a1a2e;
+            --accent: #00d4aa;
+            --accent-hover: #00f5c4;
+            --text: #ffffff;
+            --text-muted: #8888aa;
+            --border: #2a2a4a;
+            --card-bg: #16162a;
+            --success: #00d4aa;
+            --warning: #ffa500;
+            --error: #ff4757;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
+                radial-gradient(80% 80%, rgba(100ellipse at , 100, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00d4aa, #00aaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        
+        /* Language Selector */
+        .lang-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .lang-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lang-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+        
+        .lang-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--primary);
+        }
+        
+        /* Voice Recorder */
+        .recorder {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .record-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--accent);
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+        }
+        
+        .record-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(0, 212, 170, 0.4);
+        }
+        
+        .record-btn.recording {
+            background: var(--error);
+            border-color: var(--error);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+            50% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); }
+        }
+        
+        .record-hint {
+            margin-top: 15px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Status */
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status.listening {
+            display: block;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+        
+        .status.processing {
+            display: block;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+        
+        .status.success {
+            display: block;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        
+        /* Results */
+        .results {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+        
+        .result-card:hover {
+            border-color: var(--accent);
+        }
+        
+        .result-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-card .content {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .result-card .content.original {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+        
+        .copy-btn {
+            margin-left: auto;
+            padding: 6px 14px;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--primary);
+        }
+        
+        /* AI Correction Toggle */
+        .ai-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .ai-toggle label {
+            font-weight: 500;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+        
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(24px);
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        /* Mobile */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.8rem; }
+            .record-btn { width: 100px; height: 100px; font-size: 2.5rem; }
+            .lang-btn { padding: 10px 18px; font-size: 0.9rem; }
+            .result-card { padding: 20px; }
+            .result-card .content { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ Voice Translator AI</h1>
+            <p>语音输入 → AI翻译 → 智能校正</p>
+        </header>
+        
+        <!-- Language Selector -->
+        <div class="lang-selector">
+            <button class="lang-btn active" data-lang="zh">🇨🇳 中文</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+            <button class="lang-btn" data-lang="fi">🇫🇮 Suomi</button>
+        </div>
+        
+        <!-- AI Correction Toggle -->
+        <div class="ai-toggle">
+            <label>AI 智能校正</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="aiCorrect" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <!-- Voice Recorder -->
+        <div class="recorder">
+            <button class="record-btn" id="recordBtn">🎤</button>
+            <p class="record-hint">点击开始录音，再次点击结束</p>
+        </div>
+        
+        <!-- Status -->
+        <div class="status" id="status"></div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在处理...</p>
+        </div>
+        
+        <!-- Results -->
+        <div class="results" id="results"></div>
+        
+        <footer>
+            <p>Powered by AI • 使用 Web Speech API</p>
+        </footer>
+    </div>
+    
+    <script>
+        // State
+        let isRecording = false;
+        let recognition = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let currentLang = 'zh';
+        
+        // Language labels
+        const langLabels = {
+            zh: '中文',
+            en: 'English',
+            fi: 'Suomi'
+        };
+        
+        // UI Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const status = document.getElementById('status');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const aiCorrectToggle = document.getElementById('aiCorrect');
+        const langBtns = document.querySelectorAll('.lang-btn');
+        
+        // Language selector
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                langBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLang = btn.dataset.lang;
+            });
+        });
+        
+        // Check Web Speech API support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            status.textContent = '您的浏览器不支持语音识别，请使用 Chrome 或 Edge';
+            status.className = 'status error';
+            status.style.display = 'block';
+            recordBtn.disabled = true;
+        }
+        
+        // Initialize Speech Recognition
+        function initRecognition() {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'zh-CN';
+            
+            recognition.onstart = () => {
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recordBtn.textContent = '⏹';
+                showStatus('正在聆听...', 'listening');
+            };
+            
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                if (interimTranscript) {
+                    showStatus(`识别中: ${interimTranscript}...`, 'listening');
+                }
+                
+                if (finalTranscript) {
+                    processVoice(finalTranscript);
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                if (event.error === 'no-speech') {
+                    showStatus('未检测到语音，请重试', 'error');
+                    setTimeout(() => stopRecording(), 1500);
+                } else {
+                    showStatus('识别错误: ' + event.error, 'error');
+                }
+            };
+            
+            recognition.onend = () => {
+                if (isRecording) {
+                    // Restart if still recording
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.log('Recognition stopped');
+                    }
+                }
+            };
+        }
+        
+        // Start/Stop Recording
+        function toggleRecording() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+        
+        function startRecording() {
+            if (!recognition) {
+                initRecognition();
+            }
+            
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error('Start error:', e);
+            }
+        }
+        
+        function stopRecording() {
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            recordBtn.textContent = '🎤';
+            
+            if (recognition) {
+                recognition.stop();
+            }
+            
+            hideStatus();
+        }
+        
+        // Process voice input
+        async function processVoice(text) {
+            if (!text.trim()) return;
+            
+            showLoading(true);
+            showStatus('AI 翻译中...', 'processing');
+            
+            try {
+                // Get target language
+                const targetLang = currentLang;
+                const useAICorrect = aiCorrectToggle.checked;
+                
+                // Build prompt
+                let prompt = `请将以下内容翻译成${langLabels[targetLang]}:\n\n${text}`;
+                
+                if (useAICorrect) {
+                    prompt = `请完成以下任务：
+1. 将以下内容翻译成${langLabels[targetLang]}
+2. 如果原文是${langLabels[targetLang]}，则进行语法和用词校正
+3. 确保翻译/校正后的内容准确、流畅、自然
+
+原文: ${text}`;
+                }
+                
+                // Call AI API (using a simple mock for demo - would need actual API key)
+                const translated = await callAI(prompt);
+                
+                // Display results
+                displayResults(text, translated);
+                showStatus('翻译完成!', 'success');
+                
+            } catch (error) {
+                console.error('Processing error:', error);
+                showStatus('处理失败，请重试', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Mock AI call - Replace with actual API
+        async function callAI(prompt) {
+            // This is a placeholder. In production, you would:
+            // 1. Use OpenAI API
+            // 2. Use Anthropic API
+            // 3. Use a local LLM
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // For demo, return a mock translation
+            // In reality, this would call an actual AI API
+            const targetLang = currentLang;
+            
+            // Mock translations
+            const mockTranslations = {
+                en: "This is a sample translation. In the actual version, this would be replaced with the real AI translation result using your API key.",
+                fi: "Tämä on esimerkki käännös. Todellisessa versiossa tämä korvataan todellisella AI-käännöstuloksella API-avaimellasi.",
+                zh: "这是一个示例翻译。在实际版本中，这将被替换为使用你的 API 密钥的真实 AI 翻译结果。"
+            };
+            
+            return mockTranslations[targetLang];
+        }
+        
+        // Display results
+        function displayResults(original, translated) {
+            results.innerHTML = `
+                <div class="result-card">
+                    <h3>📝 原始语音 <button class="copy-btn" onclick="copyText(this, '${escapeHtml(original)}')">复制</button></h3>
+                    <div class="content original">${escapeHtml(original)}</div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>🌍 ${langLabels[currentLang]} 翻译/校正 <button class="copy-btn" onclick="copyText(this, '${escapeHtml(translated)}')">复制</button></h3>
+                    <div class="content">${escapeHtml(translated)}</div>
+                </div>
+            `;
+        }
+        
+        // Helper functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function hideStatus() {
+            status.style.display = 'none';
+        }
+        
+        function showLoading(show) {
+            loading.classList.toggle('show', show);
+            if (show) {
+                results.innerHTML = '';
+            }
+        }
+        
+        function copyText(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const original = btn.textContent;
+                btn.textContent = '已复制!';
+                setTimeout(() => btn.textContent = original, 1500);
+            });
+        }
+        
+        // Event listeners
+        recordBtn.addEventListener('click', toggleRecording);
+        
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+                toggleRecording();
+            }
+        });
+    </script>
+</body>
+</html>
