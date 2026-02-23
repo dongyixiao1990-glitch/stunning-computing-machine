@@ -100,7 +100,7 @@
         
         .recorder {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         
         .record-btn {
@@ -137,92 +137,6 @@
             margin-top: 15px;
             color: var(--text-muted);
             font-size: 0.95rem;
-        }
-        
-        .status {
-            text-align: center;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            display: none;
-        }
-        
-        .status.listening {
-            display: block;
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid var(--error);
-            color: var(--error);
-        }
-        
-        .status.processing {
-            display: block;
-            background: rgba(255, 165, 0, 0.1);
-            border: 1px solid var(--warning);
-            color: var(--warning);
-        }
-        
-        .status.success {
-            display: block;
-            background: rgba(0, 212, 170, 0.1);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-        
-        .results {
-            display: grid;
-            gap: 20px;
-        }
-        
-        .result-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 25px;
-            transition: all 0.3s;
-        }
-        
-        .result-card:hover {
-            border-color: var(--accent);
-        }
-        
-        .result-card h3 {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .result-card .content {
-            font-size: 1.15rem;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .result-card .content.original {
-            font-style: italic;
-            color: var(--text-muted);
-        }
-        
-        .copy-btn {
-            margin-left: auto;
-            padding: 6px 14px;
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .copy-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: var(--primary);
         }
         
         .ai-toggle {
@@ -282,6 +196,181 @@
             transform: translateX(24px);
         }
         
+        /* Status */
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status.listening {
+            display: block;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+        
+        .status.processing {
+            display: block;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+        
+        .status.success {
+            display: block;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .results-section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .result-item h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .result-item .content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: var(--secondary);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .result-item .content.original {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+        
+        .result-item .content.translated {
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .copy-btn {
+            padding: 8px 16px;
+            background: var(--accent);
+            border: none;
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+        
+        .copy-btn.copied {
+            background: var(--success);
+        }
+        
+        /* Final Output Box - 突出显示 */
+        .final-output {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(0, 170, 255, 0.15));
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        .final-output h3 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .final-output .content {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .final-output .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .action-btn.primary {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .action-btn.primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .action-btn.secondary {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .action-btn.secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        /* Loading */
         .loading {
             display: none;
             text-align: center;
@@ -306,6 +395,48 @@
             to { transform: rotate(360deg); }
         }
         
+        /* History */
+        .history {
+            margin-top: 30px;
+        }
+        
+        .history h2 {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+        
+        .history-item {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .history-item:hover {
+            border-color: var(--accent);
+        }
+        
+        .history-item .original {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .history-item .translated {
+            font-size: 1rem;
+            color: var(--accent);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
         footer {
             text-align: center;
             padding: 40px 20px;
@@ -313,28 +444,23 @@
             font-size: 0.9rem;
         }
         
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        
         .api-note {
             background: rgba(255, 165, 0, 0.1);
             border: 1px solid var(--warning);
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px;
             margin-bottom: 20px;
             text-align: center;
             color: var(--warning);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         @media (max-width: 600px) {
             header h1 { font-size: 1.8rem; }
             .record-btn { width: 100px; height: 100px; font-size: 2.5rem; }
             .lang-btn { padding: 10px 18px; font-size: 0.9rem; }
-            .result-card { padding: 20px; }
-            .result-card .content { font-size: 1rem; }
+            .result-item .content { font-size: 1rem; }
+            .final-output .content { font-size: 1.15rem; }
         }
     </style>
 </head>
@@ -375,7 +501,31 @@
             <p>正在处理...</p>
         </div>
         
-        <div class="results" id="results"></div>
+        <!-- 结果展示区域 -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2>📋 翻译结果</h2>
+            
+            <div class="result-item">
+                <h3>🎤 原始语音</h3>
+                <div class="content original" id="originalText"></div>
+            </div>
+            
+            <div class="result-item">
+                <h3>🌍 翻译结果</h3>
+                <div class="content translated" id="translatedText"></div>
+            </div>
+            
+            <!-- 最终输出框 - 突出显示 -->
+            <div class="final-output" id="finalOutput">
+                <h3>✨ 最终输出结果</h3>
+                <div class="content" id="finalText"></div>
+                <div class="actions">
+                    <button class="action-btn primary" onclick="copyFinal()">📋 复制结果</button>
+                    <button class="action-btn secondary" onclick="speakFinal()">🔊 朗读</button>
+                    <button class="action-btn secondary" onclick="clearResults()">🗑️ 清除</button>
+                </div>
+            </div>
+        </div>
         
         <footer>
             <p>Powered by MiniMax-M2.5 AI • 使用 Web Speech API</p>
@@ -391,6 +541,8 @@
         let isRecording = false;
         let recognition = null;
         let currentLang = 'zh';
+        let currentOriginal = '';
+        let currentTranslated = '';
         
         const langLabels = {
             zh: '中文',
@@ -404,11 +556,20 @@
             fi: 'fi-FI'
         };
         
+        const langNames = {
+            zh: 'Chinese',
+            en: 'English',
+            fi: 'Finnish'
+        };
+        
         // UI Elements
         const recordBtn = document.getElementById('recordBtn');
         const status = document.getElementById('status');
         const loading = document.getElementById('loading');
-        const results = document.getElementById('results');
+        const resultsSection = document.getElementById('resultsSection');
+        const originalText = document.getElementById('originalText');
+        const translatedText = document.getElementById('translatedText');
+        const finalText = document.getElementById('finalText');
         const aiCorrectToggle = document.getElementById('aiCorrect');
         const langBtns = document.querySelectorAll('.lang-btn');
         
@@ -441,6 +602,8 @@
                 recordBtn.classList.add('recording');
                 recordBtn.textContent = '⏹';
                 showStatus('正在聆听...', 'listening');
+                // 隐藏之前的结果
+                resultsSection.style.display = 'none';
             };
             
             recognition.onresult = (event) => {
@@ -521,6 +684,7 @@
         async function processVoice(text) {
             if (!text.trim()) return;
             
+            currentOriginal = text;
             showLoading(true);
             showStatus('AI 翻译中...', 'processing');
             
@@ -532,21 +696,22 @@
                 let userPrompt = '';
                 
                 if (useAICorrect) {
-                    systemPrompt = `你是一个专业的翻译助手和语言校正专家。你的任务是：
-1. 识别输入文本的语言
-2. 将文本翻译成${langLabels[targetLang]}
-3. 如果输入已经是${langLabels[targetLang]}，则进行语法、用词、表达方式的校正
-4. 确保输出自然、流畅、专业
-5. 只输出翻译/校正后的内容，不要添加解释`;
+                    systemPrompt = `You are a professional translator and language correction expert. Your task is:
+1. Identify the language of the input text
+2. Translate the text to ${langNames[targetLang]}
+3. If the input is already in ${langNames[targetLang]}, correct grammar, word choice, and expression
+4. Ensure the output is natural, smooth, and professional
+5. ONLY output the translated/corrected content, do not add any explanations`;
                     
-                    userPrompt = `请翻译或校正以下内容到${langLabels[targetLang]}:\n\n${text}`;
+                    userPrompt = `Please translate or correct the following to ${langNames[targetLang]}:\n\n${text}`;
                 } else {
-                    systemPrompt = `你是一个专业的翻译助手。将输入的文本翻译成${langLabels[targetLang]}。只输出翻译内容，不要添加任何解释。`;
-                    userPrompt = `翻译: ${text}`;
+                    systemPrompt = `You are a professional translator. Translate the input text to ${langNames[targetLang]}. Only output the translated content, do not add any explanations.`;
+                    userPrompt = `Translate: ${text}`;
                 }
                 
                 const translated = await callMiniMaxAPI(systemPrompt, userPrompt);
                 
+                currentTranslated = translated;
                 displayResults(text, translated);
                 showStatus('翻译完成!', 'success');
                 
@@ -593,23 +758,13 @@
         
         // Display results
         function displayResults(original, translated) {
-            results.innerHTML = `
-                <div class="result-card">
-                    <h3>📝 原始语音 <button class="copy-btn" onclick="copyText(this, '${escapeHtml(original)}')">复制</button></h3>
-                    <div class="content original">${escapeHtml(original)}</div>
-                </div>
-                
-                <div class="result-card">
-                    <h3>🌍 ${langLabels[currentLang]} 翻译/校正 <button class="copy-btn" onclick="copyText(this, '${escapeHtml(translated)}')">复制</button></h3>
-                    <div class="content">${escapeHtml(translated)}</div>
-                </div>
-            `;
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            resultsSection.style.display = 'block';
+            originalText.textContent = original;
+            translatedText.textContent = translated;
+            finalText.textContent = translated;
+            
+            // 滚动到结果区域
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         function showStatus(message, type) {
@@ -623,17 +778,35 @@
         
         function showLoading(show) {
             loading.classList.toggle('show', show);
-            if (show) {
-                results.innerHTML = '';
-            }
         }
         
-        function copyText(btn, text) {
-            navigator.clipboard.writeText(text).then(() => {
+        // Copy final result
+        function copyFinal() {
+            navigator.clipboard.writeText(currentTranslated).then(() => {
+                const btn = document.querySelector('.action-btn.primary');
                 const original = btn.textContent;
-                btn.textContent = '已复制!';
-                setTimeout(() => btn.textContent = original, 1500);
+                btn.textContent = '✓ 已复制!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.classList.remove('copied');
+                }, 2000);
             });
+        }
+        
+        // Speak the result
+        function speakFinal() {
+            const utterance = new SpeechSynthesisUtterance(currentTranslated);
+            utterance.lang = langCodes[currentLang];
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        }
+        
+        // Clear results
+        function clearResults() {
+            resultsSection.style.display = 'none';
+            currentOriginal = '';
+            currentTranslated = '';
         }
         
         // Event listeners
