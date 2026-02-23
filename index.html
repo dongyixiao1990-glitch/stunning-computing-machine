@@ -78,6 +78,17 @@
         #games .section-header h2 { color: white; }
         #games .section-header p { color: rgba(255,255,255,0.7); }
         #games .section-header .line { background: var(--gold); }
+        
+        /* Tools Section */
+        #tools { background: white; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .tool-card { background: #f8f9fa; border-radius: 15px; padding: 25px; transition: all 0.3s; border: 1px solid #eee; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-color: var(--gold); }
+        .tool-card h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .tool-card h3 i { color: var(--gold); }
+        .tool-card p { color: #666; font-size: 0.9rem; margin-bottom: 15px; }
+        .tool-link { display: inline-flex; align-items: center; gap: 8px; color: #3498db; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .tool-link:hover { color: var(--gold); }
         .games-note { text-align: center; color: rgba(255,255,255,0.6); font-style: italic; margin-bottom: 40px; font-size: 1.1rem; }
         .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
         .game-card { background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
@@ -171,6 +182,7 @@
                 <li><a href="#story" data-en="My Story" data-fi="Tarina" data-zh="我的故事">My Story</a></li>
                 <li><a href="#experience" data-en="Experience" data-fi="Kokemus" data-zh="工作经历">Experience</a></li>
                 <li><a href="#games" data-en="Games" data-fi="Pelit" data-zh="游戏">Games</a></li>
+                <li><a href="#tools" data-en="Tools" data-fi="Työkalut" data-zh="常用工具">Tools</a></li>
                 <li><a href="#portfolio" data-en="Portfolio" data-fi="Portfolio" data-zh="作品集">Portfolio</a></li>
                 <li><a href="#contact" data-en="Contact" data-fi="Yhteys" data-zh="联系方式">Contact</a></li>
             </ul>
@@ -299,6 +311,24 @@
                         <p data-en="Match 3 identical fruits to clear them!" data-fi="Yhdistä 3 samaa hedelmää." data-zh="三个相同水果即可消除！">Fruit matching puzzle</p>
                         <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/xiaoxiaole.html" target="_blank" class="game-link"><span data-en="Play Now" data-fi="Pelaa nyt" data-zh="立即游玩">Play Now</span> <i class="fas fa-external-link-alt"></i></a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section id="tools">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Common Tools" data-fi="Työkalut" data-zh="常用工具">Common Tools</h2>
+                <div class="line"></div>
+                <p data-en="Handy tools for daily use" data-fi="Hyödyllisiä työkaluja" data-zh="日常使用的便捷工具">Handy tools for daily use</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3><i class="fas fa-microphone"></i> Voice Translator</h3>
+                    <p data-en="AI-powered voice translator with speech recognition, translation, and text organization. Supports English and Finnish." data-fi="Äänitunnistus ja käännös." data-zh="AI语音翻译工具，支持语音识别、翻译和文本整理。支持英文和芬兰语。">AI voice translator with speech recognition</p>
+                    <a href="https://dongyixiao1990-glitch.github.io/stunning-computing-machine/voice-translator.html" target="_blank" class="tool-link">Open Tool <i class="fas fa-external-link-alt"></i></a>
                 </div>
             </div>
         </div>
