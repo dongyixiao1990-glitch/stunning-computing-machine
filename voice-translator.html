@@ -33,10 +33,9 @@
         .spinner { width: 40px; height: 40px; border: 3px solid #2a2a4a; border-top-color: #00d4aa; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* 结果显示区域 */
-        .result-area { background: #16162a; border: 2px solid #2a2a4a; border-radius: 15px; padding: 20px; margin-bottom: 20px; display: none; }
-        .result-area.show { display: block; }
-        .result-area h2 { font-size: 1rem; color: #888; margin-bottom: 15px; }
+        /* 结果显示区域 - 始终显示 */
+        .result-area { background: #16162a; border: 2px solid #00d4aa; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .result-area h2 { font-size: 1rem; color: #00d4aa; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
         .result-box { margin-bottom: 15px; }
         .result-box label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 5px; }
@@ -48,6 +47,7 @@
         .btn-row button { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
         .btn-copy { background: #00d4aa; color: #000; }
         .btn-speak { background: #2a2a4a; color: #fff; }
+        .btn-row button:disabled { opacity: 0.5; cursor: not-allowed; }
         
         /* 历史记录 */
         .history-area { margin-top: 30px; }
@@ -98,30 +98,30 @@
             <p>处理中...</p>
         </div>
         
-        <!-- 结果显示 -->
+        <!-- 结果显示区域 - 始终可见！ -->
         <div class="result-area" id="resultArea">
-            <h2>📋 翻译结果</h2>
+            <h2>📋 翻译结果 <span style="font-size:0.8rem;color:#666;">(翻译后显示在这里)</span></h2>
             
             <div class="result-box">
                 <label>🎤 原始语音</label>
-                <div class="content original" id="originalContent">--</div>
+                <div class="content original" id="originalContent">请开始录音...</div>
             </div>
             
             <div class="result-box">
-                <label>🌍 翻译结果</label>
-                <div class="content translated" id="translatedContent">--</div>
+                <label>🌍 翻译结果 (点击复制)</label>
+                <div class="content translated" id="translatedContent" onclick="copyResult()" style="cursor:pointer;">翻译结果将显示在这里</div>
             </div>
             
             <div class="btn-row">
-                <button class="btn-copy" onclick="copyResult()">📋 复制结果</button>
-                <button class="btn-speak" onclick="speakResult()">🔊 朗读</button>
+                <button class="btn-copy" id="copyBtn" onclick="copyResult()" disabled>📋 复制结果</button>
+                <button class="btn-speak" id="speakBtn" onclick="speakResult()" disabled>🔊 朗读</button>
             </div>
         </div>
         
         <!-- 历史记录 -->
         <div class="history-area">
             <h2>
-                <span>📜 历史记录</span>
+                <span>📜 历史记录 (点击查看)</span>
                 <button class="clear-btn" onclick="clearHistory()">清除</button>
             </h2>
             <div class="history-list" id="historyList">
@@ -158,6 +158,8 @@
     const translatedContent = document.getElementById('translatedContent');
     const historyList = document.getElementById('historyList');
     const langBtns = document.querySelectorAll('.lang-btn');
+    const copyBtn = document.getElementById('copyBtn');
+    const speakBtn = document.getElementById('speakBtn');
     
     // 初始化
     renderHistory();
@@ -188,8 +190,10 @@
             isRecording = true;
             recordBtn.classList.add('recording');
             recordBtn.textContent = '⏹';
-            resultArea.classList.remove('show');
-            showStatus('🎤 正在聆听...', 'listen');
+            showStatus('🎤 正在聆听，请说话...', 'listen');
+            // 更新显示
+            originalContent.textContent = '正在识别语音...';
+            translatedContent.textContent = '等待翻译...';
         };
         
         recognition.onresult = (e) => {
@@ -198,13 +202,16 @@
                 if (e.results[i].isFinal) final += e.results[i][0].transcript;
                 else interim += e.results[i][0].transcript;
             }
-            if (interim) showStatus('识别: ' + interim, 'listen');
+            if (interim) {
+                originalContent.textContent = interim;
+                showStatus('识别中: ' + interim, 'listen');
+            }
             if (final) processVoice(final);
         };
         
         recognition.onerror = (e) => {
             if (e.error === 'no-speech') {
-                showStatus('⚠️ 未检测到语音', 'listen');
+                showStatus('⚠️ 未检测到语音，请重试', 'listen');
                 setTimeout(stopRecording, 1500);
             }
         };
@@ -226,35 +233,39 @@
         recordBtn.classList.remove('recording');
         recordBtn.textContent = '🎤';
         if (recognition) recognition.stop();
-        statusMsg.style.display = 'none';
     }
     
     // 处理语音
     async function processVoice(text) {
         if (!text.trim()) return;
         currentOriginal = text;
-        showStatus('🤖 AI翻译中...', 'process');
+        showStatus('🤖 AI翻译中，请稍候...', 'process');
         loading.classList.add('show');
+        
+        // 显示原始文本
+        originalContent.textContent = text;
+        translatedContent.textContent = '正在翻译...';
         
         try {
             const useAI = document.getElementById('aiCorrect').checked;
             const system = useAI 
-                ? `Translate to ${langNames[currentLang]}. If already in ${langNames[currentLang]}, correct grammar. Output only the result.`
-                : `Translate to ${langNames[currentLang]}. Output only the translated text.`;
+                ? `Translate to ${langNames[currentLang]}. If already in ${langNames[currentLang]}, correct grammar and expression. Output ONLY the result, no explanations.`
+                : `Translate to ${langNames[currentLang]}. Output ONLY the translated text, no explanations.`;
             
             const result = await callAPI(system, text);
             currentTranslated = result;
             
-            // 显示结果
-            originalContent.textContent = text;
+            // 显示翻译结果
             translatedContent.textContent = result;
-            resultArea.classList.add('show');
+            copyBtn.disabled = false;
+            speakBtn.disabled = false;
             
             // 保存历史
             addToHistory(text, result);
             
             showStatus('✅ 翻译完成!', 'done');
         } catch (err) {
+            translatedContent.textContent = '❌ 翻译失败: ' + err.message;
             showStatus('❌ 错误: ' + err.message, 'listen');
         } finally {
             loading.classList.remove('show');
@@ -272,7 +283,7 @@
                 max_tokens: 4096, temperature: 0.7
             })
         });
-        if (!res.ok) throw new Error('API错误');
+        if (!res.ok) throw new Error('API错误: ' + res.status);
         const data = await res.json();
         if (!data.choices?.[0]?.message?.content) throw new Error('返回格式错误');
         return data.choices[0].message.content.trim();
@@ -307,14 +318,12 @@
         currentTranslated = item.trans;
         currentLang = item.lang;
         
-        // 更新语言按钮
         langBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === item.lang));
         
-        // 显示结果
         originalContent.textContent = item.orig;
         translatedContent.textContent = item.trans;
-        resultArea.classList.add('show');
-        resultArea.scrollIntoView({ behavior: 'smooth' });
+        copyBtn.disabled = false;
+        speakBtn.disabled = false;
     }
     
     function clearHistory() {
@@ -332,13 +341,15 @@
     }
     
     function copyResult() {
+        if (!currentTranslated) return;
         navigator.clipboard.writeText(currentTranslated).then(() => {
-            showStatus('✅ 已复制!', 'done');
+            showStatus('✅ 已复制到剪贴板!', 'done');
             setTimeout(() => { statusMsg.style.display = 'none'; }, 2000);
         });
     }
     
     function speakResult() {
+        if (!currentTranslated) return;
         const u = new SpeechSynthesisUtterance(currentTranslated);
         u.lang = langCodes[currentLang];
         speechSynthesis.speak(u);
