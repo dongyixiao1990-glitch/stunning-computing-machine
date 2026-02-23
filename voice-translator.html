@@ -11,56 +11,59 @@
         
         h1 { text-align: center; font-size: 1.8rem; margin-bottom: 20px; background: linear-gradient(90deg, #00d4aa, #00aaff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .record-area { text-align: center; margin-bottom: 20px; }
-        .record-btn { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #00d4aa; background: #16162a; font-size: 2.5rem; cursor: pointer; }
-        .record-btn.recording { background: #ff4757; border-color: #ff4757; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,71,87,0.7); } 50% { box-shadow: 0 0 0 20px rgba(255,71,87,0); } }
-        .record-hint { margin-top: 10px; color: #666; font-size: 0.9rem; }
+        .record-area { text-align: center; margin-bottom: 20px; padding: 30px; background: #16162a; border-radius: 15px; }
+        .record-btn { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #00d4aa; background: #0f0f1a; font-size: 2.5rem; cursor: pointer; }
+        .record-btn:hover { background: #1a1a2e; }
+        .record-btn.recording { background: #ff4757; border-color: #ff4757; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,71,87,0.7); } 50% { box-shadow: 0 0 0 25px rgba(255,71,87,0); } }
+        .record-hint { margin-top: 15px; color: #888; font-size: 0.95rem; }
+        .record-hint.recording { color: #ff4757; }
         
-        .status-msg { text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
-        .status-msg.listen { display: block; background: rgba(255,71,87,0.2); color: #ff4757; }
-        .status-msg.process { display: block; background: rgba(255,165,0,0.2); color: #ffa500; }
-        .status-msg.done { display: block; background: rgba(0,212,170,0.2); color: #00d4aa; }
-        .status-msg.error { display: block; background: rgba(255,71,87,0.3); color: #ff4757; }
+        .status-msg { text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; }
+        .status-msg.show { display: block; }
+        .status-msg.listen { background: rgba(255,71,87,0.2); color: #ff4757; }
+        .status-msg.process { background: rgba(255,165,0,0.2); color: #ffa500; }
+        .status-msg.done { background: rgba(0,212,170,0.2); color: #00d4aa; }
+        .status-msg.error { background: rgba(255,71,87,0.3); color: #ff4757; }
         
-        .loading { display: none; text-align: center; padding: 30px; }
+        .loading { display: none; text-align: center; padding: 20px; }
         .loading.show { display: block; }
-        .spinner { width: 40px; height: 40px; border: 3px solid #2a2a4a; border-top-color: #00d4aa; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+        .spinner { width: 35px; height: 35px; border: 3px solid #2a2a4a; border-top-color: #00d4aa; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* 结果区域 */
-        .result-area { background: #16162a; border: 2px solid #00d4aa; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
-        .result-area h2 { font-size: 1rem; color: #00d4aa; margin-bottom: 15px; }
+        .result-area { background: #16162a; border: 2px solid #2a2a4a; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .result-area h2 { font-size: 1rem; color: #888; margin-bottom: 15px; }
         
         .result-box { margin-bottom: 15px; }
-        .result-box label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 5px; }
-        .result-box .content { background: #0f0f1a; padding: 15px; border-radius: 10px; font-size: 1.1rem; line-height: 1.5; min-height: 50px; word-wrap: break-word; cursor: pointer; }
-        .result-box .content:hover { background: #1a1a2e; }
-        .result-box .content.chinese { color: #fff; }
-        .result-box .content.english { color: #00d4aa; font-weight: bold; }
-        .result-box .content.finnish { color: #00aaff; font-weight: bold; }
+        .result-box label { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+        .result-box .content { background: #0f0f1a; padding: 15px; border-radius: 10px; font-size: 1.1rem; line-height: 1.6; min-height: 50px; word-wrap: break-word; cursor: pointer; border: 1px solid #2a2a4a; }
+        .result-box .content:hover { border-color: #00d4aa; }
+        .result-box .content.placeholder { color: #444; }
         
-        /* 翻译按钮 */
+        .result-box.chinese .content { color: #fff; border-color: #00d4aa; }
+        .result-box.english .content { color: #00d4aa; }
+        .result-box.finnish .content { color: #00aaff; }
+        
         .translate-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .translate-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
-        .translate-btn.en { background: #2a2a4a; color: #00d4aa; border: 1px solid #00d4aa; }
-        .translate-btn.fi { background: #2a2a4a; color: #00aaff; border: 1px solid #00aaff; }
-        .translate-btn:hover { opacity: 0.8; }
+        .translate-btn { flex: 1; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
+        .translate-btn.en { background: #00d4aa; color: #000; }
+        .translate-btn.fi { background: #00aaff; color: #000; }
+        .translate-btn:hover { opacity: 0.85; }
+        .translate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         
-        /* 复制按钮 */
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-row button { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-copy { background: #00d4aa; color: #000; }
+        .btn-copy { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #2a2a4a; background: #16162a; color: #888; font-weight: bold; cursor: pointer; }
+        .btn-copy:hover { border-color: #00d4aa; color: #00d4aa; }
         
-        /* 历史记录 */
         .history-area { margin-top: 30px; }
         .history-area h2 { font-size: 1rem; color: #888; margin-bottom: 15px; }
         
         .history-list { display: flex; flex-direction: column; gap: 10px; }
         .history-item { background: #16162a; border: 1px solid #2a2a4a; border-radius: 12px; padding: 15px; }
         .history-item .meta { font-size: 0.7rem; color: #444; margin-bottom: 8px; }
-        .history-item .text { color: #fff; font-size: 0.95rem; line-height: 1.4; margin-bottom: 8px; }
-        .history-item .copy-btn { padding: 6px 12px; background: #2a2a4a; border: none; color: #888; border-radius: 15px; font-size: 0.8rem; cursor: pointer; margin-right: 8px; }
+        .history-item .text { color: #fff; font-size: 0.9rem; line-height: 1.5; margin-bottom: 6px; }
+        .history-item .text.en { color: #00d4aa; }
+        .history-item .text.fi { color: #00aaff; }
         
         .no-history { text-align: center; color: #444; padding: 30px; }
         footer { text-align: center; padding: 30px; color: #444; font-size: 0.8rem; }
@@ -71,53 +74,52 @@
         <h1>🎙️ Voice Translator AI</h1>
         
         <div class="record-area">
-            <button class="record-btn" id="recordBtn" onclick="toggleRecord()">🎤</button>
-            <p class="record-hint">点击开始录音，再次点击结束</p>
+            <button class="record-btn" id="recordBtn">🎤</button>
+            <p class="record-hint" id="recordHint">点击开始录音，说完后再次点击结束</p>
         </div>
         
         <div class="status-msg" id="statusMsg"></div>
         
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>处理中...</p>
+            <p style="margin-top:10px;color:#888;">AI处理中...</p>
         </div>
         
-        <!-- 结果显示 -->
-        <div class="result-area" id="resultArea">
-            <h2>📋 语音识别结果</h2>
+        <div class="result-area">
+            <h2>📋 识别结果</h2>
             
-            <div class="result-box">
-                <label>🎤 识别到的内容 (中文)</label>
-                <div class="content chinese" id="chineseContent" onclick="copyText('chinese')">请开始录音...</div>
+            <!-- 中文框 -->
+            <div class="result-box chinese">
+                <label>🎤 中文 (点击复制)</label>
+                <div class="content placeholder" id="chineseContent">录音后将显示识别内容...</div>
             </div>
             
             <!-- 翻译按钮 -->
             <div class="translate-buttons">
-                <button class="translate-btn en" onclick="translateTo('en')">🇬🇧 翻译成英文</button>
-                <button class="translate-btn fi" onclick="translateTo('fi')">🇫🇮 翻译成芬兰语</button>
+                <button class="translate-btn en" id="btnEn" disabled>🇬🇧 翻译成英文</button>
+                <button class="translate-btn fi" id="btnFi" disabled>🇫🇮 翻译成芬兰语</button>
             </div>
             
-            <!-- 翻译结果 -->
-            <div class="result-box" id="englishBox" style="display:none; margin-top:15px;">
+            <!-- 英文框 -->
+            <div class="result-box english" style="margin-top:15px;">
                 <label>🇬🇧 English</label>
-                <div class="content english" id="englishContent" onclick="copyText('english')">-</div>
+                <div class="content placeholder" id="englishContent">点击"翻译成英文"显示结果</div>
             </div>
             
-            <div class="result-box" id="finnishBox" style="display:none; margin-top:15px;">
+            <!-- 芬兰语框 -->
+            <div class="result-box finnish" style="margin-top:15px;">
                 <label>🇫🇮 Suomi</label>
-                <div class="content finnish" id="finnishContent" onclick="copyText('finnish')">-</div>
+                <div class="content placeholder" id="finnishContent">点击"翻译成芬兰语"显示结果</div>
             </div>
             
-            <!-- 复制按钮 -->
             <div class="btn-row">
                 <button class="btn-copy" onclick="copyText('chinese')">📋 复制中文</button>
                 <button class="btn-copy" onclick="copyText('all')">📋 复制全部</button>
             </div>
         </div>
         
-        <!-- 历史记录 -->
         <div class="history-area">
-            <h2>📜 最近历史记录</h2>
+            <h2>📜 历史记录</h2>
             <div class="history-list" id="historyList">
                 <div class="no-history">暂无历史记录</div>
             </div>
@@ -127,42 +129,41 @@
     </div>
     
     <script>
-    // ===== 配置 =====
     const API_KEY = 'sk-cp-QljDVZSp9muzcrudlIgrN-M95Cwz8bHuRCci8NFVCp2lnGU6wpDm_duG9fq6PSh-EnbcbLI4ACc4WozYfBhfHifBE56O1iF6qZyr6lZrIpDW1SCmgREx-dE';
     
-    // ===== 变量 =====
     let isRecording = false;
     let recognition = null;
+    let transcriptParts = [];  // 收集所有识别片段
     let chineseText = '';
     let englishText = '';
     let finnishText = '';
     let allHistory = [];
     
-    // ===== DOM =====
     const recordBtn = document.getElementById('recordBtn');
+    const recordHint = document.getElementById('recordHint');
     const statusMsg = document.getElementById('statusMsg');
     const loading = document.getElementById('loading');
     const chineseContent = document.getElementById('chineseContent');
     const englishContent = document.getElementById('englishContent');
     const finnishContent = document.getElementById('finnishContent');
-    const englishBox = document.getElementById('englishBox');
-    const finnishBox = document.getElementById('finnishBox');
+    const btnEn = document.getElementById('btnEn');
+    const btnFi = document.getElementById('btnFi');
     const historyList = document.getElementById('historyList');
     
-    // ===== 初始化 =====
+    // 初始化
     try {
         allHistory = JSON.parse(localStorage.getItem('vt_history') || '[]');
     } catch(e) {}
     renderHistory();
     
-    // ===== 录音功能 =====
-    function toggleRecord() {
+    // 录音按钮事件
+    recordBtn.onclick = () => {
         if (!isRecording) {
             startRecording();
         } else {
             stopRecording();
         }
-    }
+    };
     
     function startRecording() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -171,57 +172,67 @@
             return;
         }
         
+        // 重置
+        transcriptParts = [];
+        chineseText = '';
+        englishText = '';
+        finnishText = '';
+        
+        chineseContent.textContent = '正在识别...';
+        chineseContent.classList.add('placeholder');
+        englishContent.textContent = '点击"翻译成英文"显示结果';
+        englishContent.classList.add('placeholder');
+        finnishContent.textContent = '点击"翻译成芬兰语"显示结果';
+        finnishContent.classList.add('placeholder');
+        btnEn.disabled = true;
+        btnFi.disabled = true;
+        
         recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'zh-CN';  // 识别中文
+        recognition.lang = 'zh-CN';
         
         recognition.onstart = () => {
             isRecording = true;
             recordBtn.classList.add('recording');
             recordBtn.textContent = '⏹';
+            recordHint.textContent = '正在录音... 点击结束';
+            recordHint.classList.add('recording');
             showStatus('🎤 正在聆听，请说话...', 'listen');
-            
-            // 重置显示
-            chineseText = '';
-            englishText = '';
-            finnishText = '';
-            chineseContent.textContent = '正在识别...';
-            englishBox.style.display = 'none';
-            finnishBox.style.display = 'none';
         };
         
+        // 实时显示识别内容
         recognition.onresult = (event) => {
-            let final = '', interim = '';
+            let interim = '';
+            let final = '';
+            
             for (let i = event.resultIndex; i < event.results.length; i++) {
+                const t = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
-                    final += event.results[i][0].transcript;
+                    final += t;
                 } else {
-                    interim += event.results[i][0].transcript;
+                    interim += t;
                 }
             }
+            
             if (interim) {
                 chineseContent.textContent = interim;
             }
             if (final) {
-                chineseText = final;
-                chineseContent.textContent = final;
-                saveHistory(final);
-                showStatus('✅ 识别完成!', 'done');
+                transcriptParts.push(final);
+                chineseContent.textContent = transcriptParts.join('');
             }
         };
         
         recognition.onerror = (event) => {
+            console.log('错误:', event.error);
             if (event.error === 'no-speech') {
-                showStatus('⚠️ 未检测到语音', 'error');
-                setTimeout(stopRecording, 1500);
+                // 继续监听，不中断
             }
         };
         
         recognition.onend = () => {
-            if (isRecording) {
-                try { recognition.start(); } catch(e) {}
-            }
+            // 保持录音状态，不自动重启
         };
         
         try {
@@ -235,12 +246,87 @@
         isRecording = false;
         recordBtn.classList.remove('recording');
         recordBtn.textContent = '🎤';
+        recordHint.textContent = '点击开始录音，说完后再次点击结束';
+        recordHint.classList.remove('recording');
+        
         if (recognition) {
-            try { recognition.stop(); } catch(e) {}
+            try {
+                recognition.stop();
+            } catch(e) {}
+        }
+        
+        // 处理最终结果
+        if (transcriptParts.length > 0) {
+            processFinalTranscript();
+        } else {
+            showStatus('⚠️ 未检测到语音', 'error');
         }
     }
     
-    // ===== 翻译功能 =====
+    // 处理完整 transcript 并用 AI 优化
+    async function processFinalTranscript() {
+        const rawText = transcriptParts.join('');
+        
+        if (!rawText.trim()) {
+            showStatus('⚠️ 未识别到内容', 'error');
+            return;
+        }
+        
+        showStatus('🤖 AI优化中...', 'process');
+        loading.classList.add('show');
+        
+        try {
+            // 用AI优化中文文本
+            const response = await fetch('https://api.minimaxi.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + API_KEY
+                },
+                body: JSON.stringify({
+                    model: 'abab6.5s-chat',
+                    messages: [
+                        { 
+                            role: 'system', 
+                            content: '你是一个语言编辑助手。请优化以下语音识别结果：纠正明显的识别错误，修正语法，使语句通顺自然。只输出优化后的中文文本，不要添加任何解释或备注。' 
+                        },
+                        { role: 'user', content: rawText }
+                    ],
+                    max_tokens: 2048
+                })
+            });
+            
+            if (!response.ok) throw new Error('API错误');
+            
+            const data = await response.json();
+            chineseText = data.choices[0].message.content.trim();
+            
+            // 显示优化后的中文
+            chineseContent.textContent = chineseText;
+            chineseContent.classList.remove('placeholder');
+            btnEn.disabled = false;
+            btnFi.disabled = false;
+            
+            // 保存到历史
+            saveHistory(chineseText, '', '');
+            showStatus('✅ 识别完成!', 'done');
+            
+        } catch (err) {
+            console.error(err);
+            // 如果AI优化失败，使用原始文本
+            chineseText = rawText;
+            chineseContent.textContent = chineseText;
+            chineseContent.classList.remove('placeholder');
+            btnEn.disabled = false;
+            btnFi.disabled = false;
+            saveHistory(chineseText, '', '');
+            showStatus('✅ 识别完成 (原始)', 'done');
+        } finally {
+            loading.classList.remove('show');
+        }
+    }
+    
+    // 翻译功能
     async function translateTo(lang) {
         if (!chineseText) {
             showStatus('⚠️ 请先录音', 'error');
@@ -248,11 +334,10 @@
         }
         
         const targetName = lang === 'en' ? 'English' : 'Finnish';
-        const targetLabel = lang === 'en' ? englishContent : finnishContent;
-        const targetBox = lang === 'en' ? englishBox : finnishBox;
-        const targetVar = lang === 'en' ? 'englishText' : 'finnishText';
+        const targetContent = lang === 'en' ? englishContent : finnishContent;
         
-        showStatus('🤖 翻译中...', 'process');
+        showStatus('🤖 AI翻译中...', 'process');
+        loading.classList.add('show');
         
         try {
             const response = await fetch('https://api.minimaxi.com/v1/chat/completions', {
@@ -264,73 +349,62 @@
                 body: JSON.stringify({
                     model: 'abab6.5s-chat',
                     messages: [
-                        { role: 'system', content: 'You are a professional translator. Translate the following Chinese text to ' + targetName + '. Only output the translated text, nothing else.' },
+                        { 
+                            role: 'system', 
+                            content: `你是一个专业翻译家。请将以下中文文本翻译成${targetName}。只输出翻译内容，不要有任何解释。` 
+                        },
                         { role: 'user', content: chineseText }
                     ],
                     max_tokens: 2048
                 })
             });
             
-            if (!response.ok) {
-                throw new Error('API错误: ' + response.status);
-            }
+            if (!response.ok) throw new Error('API错误');
             
             const data = await response.json();
             const translated = data.choices[0].message.content.trim();
             
-            // 显示翻译结果
-            targetBox.style.display = 'block';
-            targetLabel.textContent = translated;
+            if (lang === 'en') {
+                englishText = translated;
+                englishContent.textContent = translated;
+                englishContent.classList.remove('placeholder');
+            } else {
+                finnishText = translated;
+                finnishContent.textContent = translated;
+                finnishContent.classList.remove('placeholder');
+            }
             
-            // 保存到变量
-            if (lang === 'en') englishText = translated;
-            else finnishText = translated;
-            
-            // 更新历史记录
-            updateHistory(chineseText, englishText, finnishText);
-            
+            updateHistory();
             showStatus('✅ 翻译完成!', 'done');
             
         } catch (err) {
             console.error(err);
-            targetLabel.textContent = '翻译失败: ' + err.message;
+            targetContent.textContent = '翻译失败: ' + err.message;
             showStatus('❌ 错误: ' + err.message, 'error');
+        } finally {
+            loading.classList.remove('show');
         }
     }
     
-    // ===== 历史记录 =====
-    function saveHistory(text) {
-        const item = {
-            chinese: text,
-            english: '',
-            finnish: '',
-            time: new Date().toLocaleString()
-        };
+    // 翻译按钮事件
+    btnEn.onclick = () => translateTo('en');
+    btnFi.onclick = () => translateTo('fi');
+    
+    // 历史记录
+    function saveHistory(zh, en, fi) {
+        const item = { chinese: zh, english: en, finnish: fi, time: new Date().toLocaleString() };
         allHistory.unshift(item);
         if (allHistory.length > 20) allHistory.pop();
-        try {
-            localStorage.setItem('vt_history', JSON.stringify(allHistory));
-        } catch(e) {}
+        try { localStorage.setItem('vt_history', JSON.stringify(allHistory)); } catch(e) {}
         renderHistory();
     }
     
-    function updateHistory(text, en, fi) {
-        if (allHistory.length > 0 && allHistory[0].chinese === text) {
-            allHistory[0].english = en;
-            allHistory[0].finnish = fi;
-        } else {
-            const item = {
-                chinese: text,
-                english: en,
-                finnish: fi,
-                time: new Date().toLocaleString()
-            };
-            allHistory.unshift(item);
-            if (allHistory.length > 20) allHistory.pop();
+    function updateHistory() {
+        if (allHistory.length > 0 && allHistory[0].chinese === chineseText) {
+            allHistory[0].english = englishText;
+            allHistory[0].finnish = finnishText;
         }
-        try {
-            localStorage.setItem('vt_history', JSON.stringify(allHistory));
-        } catch(e) {}
+        try { localStorage.setItem('vt_history', JSON.stringify(allHistory)); } catch(e) {}
         renderHistory();
     }
     
@@ -344,14 +418,9 @@
         allHistory.slice(0, 10).forEach(item => {
             html += '<div class="history-item">';
             html += '<div class="meta">' + item.time + '</div>';
-            html += '<div class="text">🎤 ' + escapeHtml(item.chinese) + '</div>';
-            if (item.english) {
-                html += '<div class="text" style="color:#00d4aa;">🇬🇧 ' + escapeHtml(item.english) + '</div>';
-            }
-            if (item.finnish) {
-                html += '<div class="text" style="color:#00aaff;">🇫🇮 ' + escapeHtml(item.finnish) + '</div>';
-            }
-            html += '<button class="copy-btn" onclick="copyHistory(\'' + escapeHtml(item.chinese).replace(/'/g, "\\'") + '\')">📋 复制</button>';
+            if (item.chinese) html += '<div class="text">🎤 ' + escapeHtml(item.chinese) + '</div>';
+            if (item.english) html += '<div class="text en">🇬🇧 ' + escapeHtml(item.english) + '</div>';
+            if (item.finnish) html += '<div class="text fi">🇫🇮 ' + escapeHtml(item.finnish) + '</div>';
             html += '</div>';
         });
         
@@ -364,22 +433,14 @@
         return div.innerHTML;
     }
     
-    // ===== 复制功能 =====
+    // 复制
     function copyText(type) {
         let text = '';
-        
-        if (type === 'chinese') {
-            text = chineseText;
-        } else if (type === 'english') {
-            text = englishText;
-        } else if (type === 'finnish') {
-            text = finnishText;
-        } else if (type === 'all') {
-            text = '中文: ' + chineseText + '\n\nEnglish: ' + englishText + '\n\nSuomi: ' + finnishText;
-        }
+        if (type === 'chinese') text = chineseText;
+        else if (type === 'all') text = '【中文】' + chineseText + '\n\n【English】' + englishText + '\n\n【Suomi】' + finnishText;
         
         if (!text) {
-            showStatus('⚠️ 没有内容可复制', 'error');
+            showStatus('⚠️ 没有内容', 'error');
             return;
         }
         
@@ -388,23 +449,19 @@
         });
     }
     
-    function copyHistory(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showStatus('✅ 已复制!', 'done');
-        });
-    }
+    // 点击内容复制
+    chineseContent.onclick = () => chineseText && copyText('chinese');
     
-    // ===== 工具 =====
     function showStatus(msg, type) {
         statusMsg.textContent = msg;
-        statusMsg.className = 'status-msg ' + type;
+        statusMsg.className = 'status-msg show ' + type;
     }
     
     // 空格键
     document.onkeydown = e => {
         if (e.code === 'Space' && !e.target.matches('input,textarea')) {
             e.preventDefault();
-            toggleRecord();
+            recordBtn.click();
         }
     };
     </script>
