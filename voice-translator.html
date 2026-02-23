@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Translator AI - 语音翻译助手</title>
-    <meta name="description" content="Voice translator with AI correction in Chinese, English, and Finnish">
+    <title>Voice Translator AI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -12,85 +11,57 @@
             --primary: #0f0f1a;
             --secondary: #1a1a2e;
             --accent: #00d4aa;
-            --accent-hover: #00f5c4;
             --text: #ffffff;
             --text-muted: #8888aa;
             --border: #2a2a4a;
             --card-bg: #16162a;
-            --success: #00d4aa;
-            --warning: #ffa500;
-            --error: #ff4757;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
             background: var(--primary);
             color: var(--text);
             min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(0, 170, 255, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            padding: 20px;
         }
         
         .container {
-            max-width: 900px;
+            max-width: 700px;
             margin: 0 auto;
-            padding: 40px 20px;
         }
         
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         
         header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 10px;
+            font-size: 2rem;
             background: linear-gradient(135deg, #00d4aa, #00aaff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         
-        header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-        
+        /* Language Buttons */
         .lang-selector {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
         
         .lang-btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: 2px solid var(--border);
             background: var(--card-bg);
             color: var(--text-muted);
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 25px;
             cursor: pointer;
+            font-weight: 600;
             transition: all 0.3s;
         }
         
-        .lang-btn:hover {
-            border-color: var(--accent);
-            color: var(--text);
-        }
+        .lang-btn:hover { border-color: var(--accent); }
         
         .lang-btn.active {
             background: var(--accent);
@@ -98,265 +69,132 @@
             color: var(--primary);
         }
         
-        .recorder {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .record-btn {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid var(--accent);
-            background: var(--card-bg);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-        
-        .record-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(0, 212, 170, 0.4);
-        }
-        
-        .record-btn.recording {
-            background: var(--error);
-            border-color: var(--error);
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(255, 71, 87, 0); }
-        }
-        
-        .record-hint {
-            margin-top: 15px;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-        
+        /* AI Toggle */
         .ai-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            padding: 15px;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding: 12px;
             background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border-radius: 10px;
         }
         
-        .ai-toggle label {
-            font-weight: 500;
-        }
+        /* Record Button */
+        .recorder { text-align: center; margin-bottom: 25px; }
         
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            inset: 0;
-            background: var(--border);
-            border-radius: 26px;
-            transition: 0.3s;
-        }
-        
-        .toggle-slider::before {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
+        .record-btn {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            transition: 0.3s;
+            border: 4px solid var(--accent);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 2.5rem;
+            transition: all 0.3s;
         }
         
-        .toggle-switch input:checked + .toggle-slider {
-            background: var(--accent);
+        .record-btn:hover { transform: scale(1.05); }
+        
+        .record-btn.recording {
+            background: #ff4757;
+            border-color: #ff4757;
+            animation: pulse 1s infinite;
         }
         
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(24px);
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,71,87,0.7); }
+            50% { box-shadow: 0 0 0 20px rgba(255,71,87,0); }
+        }
+        
+        .record-hint {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
         
         /* Status */
         .status {
             text-align: center;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            display: none;
             font-weight: 500;
+        }
+        
+        .status.listening { display: block; background: rgba(255,71,87,0.2); color: #ff4757; }
+        .status.processing { display: block; background: rgba(255,165,0,0.2); color: #ffa500; }
+        .status.success { display: block; background: rgba(0,212,170,0.2); color: var(--accent); }
+        
+        /* Results Box */
+        .results-box {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
             display: none;
         }
         
-        .status.listening {
-            display: block;
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid var(--error);
-            color: var(--error);
-        }
+        .results-box.show { display: block; }
         
-        .status.processing {
-            display: block;
-            background: rgba(255, 165, 0, 0.1);
-            border: 1px solid var(--warning);
-            color: var(--warning);
-        }
-        
-        .status.success {
-            display: block;
-            background: rgba(0, 212, 170, 0.1);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-        
-        /* Results Section */
-        .results-section {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-        }
-        
-        .results-section h2 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .result-item {
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .result-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .result-item h3 {
-            font-size: 0.9rem;
+        .results-box h2 {
+            font-size: 1.1rem;
             color: var(--text-muted);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .result-item .content {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-break: break-word;
-            background: var(--secondary);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-        
-        .result-item .content.original {
-            font-style: italic;
-            color: var(--text-muted);
-        }
-        
-        .result-item .content.translated {
-            color: var(--accent);
-            font-weight: 500;
-        }
-        
-        .copy-btn {
-            padding: 8px 16px;
-            background: var(--accent);
-            border: none;
-            color: var(--primary);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .copy-btn:hover {
-            background: var(--accent-hover);
-            transform: scale(1.05);
-        }
-        
-        .copy-btn.copied {
-            background: var(--success);
-        }
-        
-        /* Final Output Box - 突出显示 */
-        .final-output {
-            background: linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(0, 170, 255, 0.15));
-            border: 2px solid var(--accent);
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 20px;
-        }
-        
-        .final-output h3 {
-            font-size: 1rem;
-            color: var(--accent);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .final-output .content {
-            font-size: 1.4rem;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-break: break-word;
-            color: var(--text);
-            font-weight: 500;
+        .result-row {
+            margin-bottom: 20px;
         }
         
-        .final-output .actions {
+        .result-row:last-child { margin-bottom: 0; }
+        
+        .result-row label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .result-row .text {
+            background: var(--secondary);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .result-row .text.original { color: var(--text-muted); font-style: italic; }
+        .result-row .text.translated { color: var(--accent); font-weight: 600; }
+        
+        /* Action Buttons */
+        .action-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 20px;
         }
         
         .action-btn {
-            padding: 10px 20px;
+            flex: 1;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            border: none;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            border: none;
         }
         
         .action-btn.primary {
             background: var(--accent);
             color: var(--primary);
-        }
-        
-        .action-btn.primary:hover {
-            background: var(--accent-hover);
         }
         
         .action-btn.secondary {
@@ -365,65 +203,53 @@
             color: var(--text);
         }
         
-        .action-btn.secondary:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        
-        /* Loading */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .loading.show {
-            display: block;
-        }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        .action-btn:hover { opacity: 0.9; transform: scale(1.02); }
         
         /* History */
-        .history {
+        .history-section {
             margin-top: 30px;
         }
         
-        .history h2 {
-            font-size: 1.1rem;
+        .history-section h2 {
+            font-size: 1rem;
             color: var(--text-muted);
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .clear-history {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .clear-history:hover { color: #ff4757; }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
         .history-item {
-            background: var(--secondary);
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 15px;
-            margin-bottom: 10px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .history-item:hover {
-            border-color: var(--accent);
-        }
+        .history-item:hover { border-color: var(--accent); }
         
         .history-item .original {
             font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -437,30 +263,50 @@
             text-overflow: ellipsis;
         }
         
-        footer {
+        .history-item .meta {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
+        }
+        
+        .history-empty {
             text-align: center;
-            padding: 40px 20px;
             color: var(--text-muted);
+            padding: 30px;
             font-size: 0.9rem;
         }
         
-        .api-note {
-            background: rgba(255, 165, 0, 0.1);
-            border: 1px solid var(--warning);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 20px;
+        /* Loading */
+        .loading {
+            display: none;
             text-align: center;
-            color: var(--warning);
+            padding: 30px;
+        }
+        
+        .loading.show { display: block; }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
             font-size: 0.85rem;
         }
         
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.8rem; }
-            .record-btn { width: 100px; height: 100px; font-size: 2.5rem; }
-            .lang-btn { padding: 10px 18px; font-size: 0.9rem; }
-            .result-item .content { font-size: 1rem; }
-            .final-output .content { font-size: 1.15rem; }
+        @media (max-width: 500px) {
+            .lang-btn { padding: 8px 14px; font-size: 0.9rem; }
+            .record-btn { width: 80px; height: 80px; font-size: 2rem; }
         }
     </style>
 </head>
@@ -468,67 +314,69 @@
     <div class="container">
         <header>
             <h1>🎙️ Voice Translator AI</h1>
-            <p>语音输入 → AI翻译 → 智能校正</p>
         </header>
         
-        <div class="api-note">
-            🤖 已连接 MiniMax-M2.5 AI
-        </div>
-        
+        <!-- Language Selector -->
         <div class="lang-selector">
             <button class="lang-btn active" data-lang="zh">🇨🇳 中文</button>
             <button class="lang-btn" data-lang="en">🇬🇧 English</button>
             <button class="lang-btn" data-lang="fi">🇫🇮 Suomi</button>
         </div>
         
+        <!-- AI Correction Toggle -->
         <div class="ai-toggle">
-            <label>AI 智能校正</label>
-            <label class="toggle-switch">
-                <input type="checkbox" id="aiCorrect" checked>
-                <span class="toggle-slider"></span>
-            </label>
+            <span>✨ AI 智能校正</span>
+            <input type="checkbox" id="aiCorrect" checked>
         </div>
         
+        <!-- Record Button -->
         <div class="recorder">
             <button class="record-btn" id="recordBtn">🎤</button>
             <p class="record-hint">点击开始录音，再次点击结束</p>
         </div>
         
+        <!-- Status -->
         <div class="status" id="status"></div>
         
+        <!-- Loading -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>正在处理...</p>
         </div>
         
-        <!-- 结果展示区域 -->
-        <div class="results-section" id="resultsSection" style="display: none;">
+        <!-- Results Display -->
+        <div class="results-box" id="resultsBox">
             <h2>📋 翻译结果</h2>
             
-            <div class="result-item">
-                <h3>🎤 原始语音</h3>
-                <div class="content original" id="originalText"></div>
+            <div class="result-row">
+                <label>🎤 原始语音</label>
+                <div class="text original" id="originalText"></div>
             </div>
             
-            <div class="result-item">
-                <h3>🌍 翻译结果</h3>
-                <div class="content translated" id="translatedText"></div>
+            <div class="result-row">
+                <label>🌍 翻译结果</label>
+                <div class="text translated" id="translatedText"></div>
             </div>
             
-            <!-- 最终输出框 - 突出显示 -->
-            <div class="final-output" id="finalOutput">
-                <h3>✨ 最终输出结果</h3>
-                <div class="content" id="finalText"></div>
-                <div class="actions">
-                    <button class="action-btn primary" onclick="copyFinal()">📋 复制结果</button>
-                    <button class="action-btn secondary" onclick="speakFinal()">🔊 朗读</button>
-                    <button class="action-btn secondary" onclick="clearResults()">🗑️ 清除</button>
-                </div>
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="copyResult()">📋 复制结果</button>
+                <button class="action-btn secondary" onclick="speakResult()">🔊 朗读</button>
+            </div>
+        </div>
+        
+        <!-- History -->
+        <div class="history-section">
+            <h2>
+                <span>📜 历史记录</span>
+                <button class="clear-history" onclick="clearHistory()">清除全部</button>
+            </h2>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">暂无历史记录</div>
             </div>
         </div>
         
         <footer>
-            <p>Powered by MiniMax-M2.5 AI • 使用 Web Speech API</p>
+            Powered by MiniMax-M2.5 AI
         </footer>
     </div>
     
@@ -543,37 +391,26 @@
         let currentLang = 'zh';
         let currentOriginal = '';
         let currentTranslated = '';
+        let history = JSON.parse(localStorage.getItem('voiceTransHistory') || '[]');
         
-        const langLabels = {
-            zh: '中文',
-            en: 'English',
-            fi: 'Suomi'
-        };
+        const langLabels = { zh: '中文', en: 'English', fi: 'Suomi' };
+        const langCodes = { zh: 'zh-CN', en: 'en-US', fi: 'fi-FI' };
+        const langNames = { zh: 'Chinese', en: 'English', fi: 'Finnish' };
         
-        const langCodes = {
-            zh: 'zh-CN',
-            en: 'en-US', 
-            fi: 'fi-FI'
-        };
-        
-        const langNames = {
-            zh: 'Chinese',
-            en: 'English',
-            fi: 'Finnish'
-        };
-        
-        // UI Elements
+        // ========== DOM ==========
         const recordBtn = document.getElementById('recordBtn');
         const status = document.getElementById('status');
         const loading = document.getElementById('loading');
-        const resultsSection = document.getElementById('resultsSection');
+        const resultsBox = document.getElementById('resultsBox');
         const originalText = document.getElementById('originalText');
         const translatedText = document.getElementById('translatedText');
-        const finalText = document.getElementById('finalText');
-        const aiCorrectToggle = document.getElementById('aiCorrect');
+        const historyList = document.getElementById('historyList');
         const langBtns = document.querySelectorAll('.lang-btn');
         
-        // Language selector
+        // 初始化
+        renderHistory();
+        
+        // 语言选择
         langBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 langBtns.forEach(b => b.classList.remove('active'));
@@ -582,15 +419,14 @@
             });
         });
         
-        // Check Web Speech API
+        // 语音识别
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
         if (!SpeechRecognition) {
-            showStatus('您的浏览器不支持语音识别，请使用 Chrome 或 Edge', 'error');
+            showStatus('⚠️ 您的浏览器不支持语音识别，请使用 Chrome', 'error');
             recordBtn.disabled = true;
         }
         
-        // Initialize Speech Recognition
         function initRecognition() {
             recognition = new SpeechRecognition();
             recognition.continuous = true;
@@ -601,222 +437,178 @@
                 isRecording = true;
                 recordBtn.classList.add('recording');
                 recordBtn.textContent = '⏹';
-                showStatus('正在聆听...', 'listening');
-                // 隐藏之前的结果
-                resultsSection.style.display = 'none';
+                showStatus('🎤 正在聆听...', 'listening');
+                resultsBox.classList.remove('show');
             };
             
             recognition.onresult = (event) => {
-                let finalTranscript = '';
-                let interimTranscript = '';
-                
+                let final = '', interim = '';
                 for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript;
-                    } else {
-                        interimTranscript += transcript;
-                    }
+                    if (event.results[i].isFinal) final += event.results[i][0].transcript;
+                    else interim += event.results[i][0].transcript;
                 }
-                
-                if (interimTranscript) {
-                    showStatus(`识别中: ${interimTranscript}...`, 'listening');
-                }
-                
-                if (finalTranscript) {
-                    processVoice(finalTranscript);
-                }
+                if (interim) showStatus(`识别中: ${interim}...`, 'listening');
+                if (final) processVoice(final);
             };
             
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                if (event.error === 'no-speech') {
-                    showStatus('未检测到语音，请重试', 'error');
-                    setTimeout(() => stopRecording(), 1500);
-                } else {
-                    showStatus('识别错误: ' + event.error, 'error');
+            recognition.onerror = (e) => {
+                if (e.error === 'no-speech') {
+                    showStatus('⚠️ 未检测到语音', 'error');
+                    setTimeout(stopRecording, 1500);
                 }
             };
             
             recognition.onend = () => {
-                if (isRecording) {
-                    try {
-                        recognition.start();
-                    } catch (e) {
-                        console.log('Recognition stopped');
-                    }
-                }
+                if (isRecording) try { recognition.start(); } catch(e) {}
             };
         }
         
-        function toggleRecording() {
+        recordBtn.addEventListener('click', () => {
             if (!isRecording) {
-                startRecording();
+                if (!recognition) initRecognition();
+                try { recognition.start(); } catch(e) {}
             } else {
                 stopRecording();
             }
-        }
-        
-        function startRecording() {
-            if (!recognition) {
-                initRecognition();
-            }
-            try {
-                recognition.start();
-            } catch (e) {
-                console.error('Start error:', e);
-            }
-        }
+        });
         
         function stopRecording() {
             isRecording = false;
             recordBtn.classList.remove('recording');
             recordBtn.textContent = '🎤';
-            
-            if (recognition) {
-                recognition.stop();
-            }
-            
+            if (recognition) recognition.stop();
             hideStatus();
         }
         
-        // Process voice with MiniMax API
+        // 处理语音
         async function processVoice(text) {
             if (!text.trim()) return;
-            
             currentOriginal = text;
             showLoading(true);
-            showStatus('AI 翻译中...', 'processing');
+            showStatus('🤖 AI 翻译中...', 'processing');
             
             try {
+                const useAICorrect = document.getElementById('aiCorrect').checked;
                 const targetLang = currentLang;
-                const useAICorrect = aiCorrectToggle.checked;
                 
-                let systemPrompt = '';
-                let userPrompt = '';
+                let systemPrompt = useAICorrect 
+                    ? `You are a professional translator. Translate to ${langNames[targetLang]}. If already in ${langNames[targetLang]}, correct grammar. Only output the result, no explanation.`
+                    : `You are a professional translator. Translate to ${langNames[targetLang]}. Only output the translated text, no explanation.`;
                 
-                if (useAICorrect) {
-                    systemPrompt = `You are a professional translator and language correction expert. Your task is:
-1. Identify the language of the input text
-2. Translate the text to ${langNames[targetLang]}
-3. If the input is already in ${langNames[targetLang]}, correct grammar, word choice, and expression
-4. Ensure the output is natural, smooth, and professional
-5. ONLY output the translated/corrected content, do not add any explanations`;
-                    
-                    userPrompt = `Please translate or correct the following to ${langNames[targetLang]}:\n\n${text}`;
-                } else {
-                    systemPrompt = `You are a professional translator. Translate the input text to ${langNames[targetLang]}. Only output the translated content, do not add any explanations.`;
-                    userPrompt = `Translate: ${text}`;
-                }
+                const result = await callAPI(systemPrompt, `Translate: ${text}`);
+                currentTranslated = result;
                 
-                const translated = await callMiniMaxAPI(systemPrompt, userPrompt);
-                
-                currentTranslated = translated;
-                displayResults(text, translated);
-                showStatus('翻译完成!', 'success');
-                
-            } catch (error) {
-                console.error('Processing error:', error);
-                showStatus('处理失败: ' + error.message, 'error');
+                showResult(text, result);
+                addToHistory(text, result);
+                showStatus('✅ 翻译完成!', 'success');
+            } catch (err) {
+                showStatus('❌ 错误: ' + err.message, 'error');
             } finally {
                 showLoading(false);
             }
         }
         
-        // Call MiniMax API
-        async function callMiniMaxAPI(systemPrompt, userPrompt) {
-            const response = await fetch(API_URL, {
+        // 调用 API
+        async function callAPI(system, user) {
+            const res = await fetch(API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
                 body: JSON.stringify({
                     model: 'MiniMax-M2.5',
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userPrompt }
-                    ],
-                    max_tokens: 4096,
-                    temperature: 0.7
+                    messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+                    max_tokens: 4096, temperature: 0.7
                 })
             });
             
-            if (!response.ok) {
-                const error = await response.text();
-                throw new Error(`API错误: ${response.status} - ${error}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                return data.choices[0].message.content.trim();
-            } else {
-                throw new Error('API返回格式错误');
-            }
+            if (!res.ok) throw new Error('API请求失败');
+            const data = await res.json();
+            if (!data.choices?.[0]?.message?.content) throw new Error('API返回格式错误');
+            return data.choices[0].message.content.trim();
         }
         
-        // Display results
-        function displayResults(original, translated) {
-            resultsSection.style.display = 'block';
+        // 显示结果
+        function showResult(original, translated) {
+            resultsBox.classList.add('show');
             originalText.textContent = original;
             translatedText.textContent = translated;
-            finalText.textContent = translated;
+            resultsBox.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 历史记录
+        function addToHistory(original, translated) {
+            const item = {
+                original,
+                translated,
+                lang: currentLang,
+                time: new Date().toLocaleString()
+            };
+            history.unshift(item);
+            if (history.length > 20) history.pop();
+            localStorage.setItem('voiceTransHistory', JSON.stringify(history));
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+                return;
+            }
+            historyList.innerHTML = history.map((item, i) => `
+                <div class="history-item" onclick="loadHistory(${i})">
+                    <div class="original">${item.original}</div>
+                    <div class="translated">${item.translated}</div>
+                    <div class="meta">${langLabels[item.lang]} • ${item.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        function loadHistory(i) {
+            const item = history[i];
+            currentOriginal = item.original;
+            currentTranslated = item.translated;
             
-            // 滚动到结果区域
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // 切换到对应的语言
+            langBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === item.lang));
+            currentLang = item.lang;
+            
+            showResult(item.original, item.translated);
         }
         
-        function showStatus(message, type) {
-            status.textContent = message;
-            status.className = `status ${type}`;
+        function clearHistory() {
+            if (confirm('确定清除所有历史记录?')) {
+                history = [];
+                localStorage.removeItem('voiceTransHistory');
+                renderHistory();
+            }
         }
         
-        function hideStatus() {
-            status.style.display = 'none';
+        // 工具函数
+        function showStatus(msg, type) {
+            status.textContent = msg;
+            status.className = 'status ' + type;
         }
         
-        function showLoading(show) {
-            loading.classList.toggle('show', show);
-        }
+        function hideStatus() { status.style.display = 'none'; }
+        function showLoading(show) { loading.classList.toggle('show', show); }
         
-        // Copy final result
-        function copyFinal() {
+        function copyResult() {
             navigator.clipboard.writeText(currentTranslated).then(() => {
-                const btn = document.querySelector('.action-btn.primary');
-                const original = btn.textContent;
-                btn.textContent = '✓ 已复制!';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = original;
-                    btn.classList.remove('copied');
-                }, 2000);
+                showStatus('✅ 已复制到剪贴板!', 'success');
+                setTimeout(hideStatus, 2000);
             });
         }
         
-        // Speak the result
-        function speakFinal() {
+        function speakResult() {
             const utterance = new SpeechSynthesisUtterance(currentTranslated);
             utterance.lang = langCodes[currentLang];
-            utterance.rate = 0.9;
             speechSynthesis.speak(utterance);
         }
         
-        // Clear results
-        function clearResults() {
-            resultsSection.style.display = 'none';
-            currentOriginal = '';
-            currentTranslated = '';
-        }
-        
-        // Event listeners
-        recordBtn.addEventListener('click', toggleRecording);
-        
-        // Keyboard shortcut
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+        // 空格键快捷键
+        document.addEventListener('keydown', e => {
+            if (e.code === 'Space' && !e.target.matches('input,textarea')) {
                 e.preventDefault();
-                toggleRecording();
+                recordBtn.click();
             }
         });
     </script>
