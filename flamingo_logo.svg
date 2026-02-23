@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- MYLLÄRI Flamingo Logo - Vector for Fusion360 -->
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#1a1a1a" stroke="#ff00aa" stroke-width="3"/>
+  
+  <!-- Magenta Circle -->
+  <circle cx="100" cy="100" r="70" fill="#ff00aa"/>
+  
+  <!-- White Flamingo Silhouette -->
+  <g fill="#ffffff">
+    <!-- Body -->
+    <ellipse cx="90" cy="110" rx="25" ry="18"/>
+    
+    <!-- Neck - elegant S curve -->
+    <path d="M105 100 Q115 80 110 60 Q108 45 115 35 Q118 30 115 28" 
+          fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Head -->
+    <circle cx="115" cy="32" r="8"/>
+    
+    <!-- Beak -->
+    <path d="M120 30 Q135 25 132 35 Q128 38 120 32" fill="#ffffff"/>
+    
+    <!-- Eye -->
+    <circle cx="113" cy="30" r="2" fill="#1a1a1a"/>
+    
+    <!-- Legs -->
+    <line x1="85" y1="125" x2="80" y2="155" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <line x1="95" y1="125" x2="100" y2="150" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Wing -->
+    <ellipse cx="75" cy="105" rx="12" ry="8" transform="rotate(-15 75 105)"/>
+  </g>
+  
+  <!-- MYLLÄRI Text - Vertical -->
+  <text x="155" y="60" fill="#ffffff" font-family="Arial Black" font-size="12" 
+        transform="rotate(90 155 60)" font-weight="bold">MYLLÄRI</text>
+  
+  <!-- Flavor Text -->
+  <text x="100" y="155" fill="#ffffff" font-family="Arial" font-size="10" 
+        text-anchor="middle" font-weight="bold">MIAMI NEIPA</text>
+  <text x="100" y="168" fill="#ffffff" font-family="Arial" font-size="8" 
+        text-anchor="middle">5.5%</text>
+</svg>
