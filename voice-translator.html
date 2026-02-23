@@ -30,14 +30,13 @@
             line-height: 1.6;
         }
         
-        /* Background */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             background: 
                 radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
-                radial-gradient(80% 80%, rgba(100ellipse at , 100, 255, 0.08) 0%, transparent 50%);
+                radial-gradient(ellipse at 80% 80%, rgba(0, 170, 255, 0.08) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
         }
@@ -48,7 +47,6 @@
             padding: 40px 20px;
         }
         
-        /* Header */
         header {
             text-align: center;
             margin-bottom: 40px;
@@ -69,7 +67,6 @@
             font-size: 1.1rem;
         }
         
-        /* Language Selector */
         .lang-selector {
             display: flex;
             justify-content: center;
@@ -101,7 +98,6 @@
             color: var(--primary);
         }
         
-        /* Voice Recorder */
         .recorder {
             text-align: center;
             margin-bottom: 40px;
@@ -119,7 +115,6 @@
             align-items: center;
             justify-content: center;
             font-size: 3rem;
-            position: relative;
         }
         
         .record-btn:hover {
@@ -144,7 +139,6 @@
             font-size: 0.95rem;
         }
         
-        /* Status */
         .status {
             text-align: center;
             padding: 15px;
@@ -175,7 +169,6 @@
             color: var(--success);
         }
         
-        /* Results */
         .results {
             display: grid;
             gap: 20px;
@@ -232,7 +225,6 @@
             color: var(--primary);
         }
         
-        /* AI Correction Toggle */
         .ai-toggle {
             display: flex;
             align-items: center;
@@ -290,7 +282,6 @@
             transform: translateX(24px);
         }
         
-        /* Loading */
         .loading {
             display: none;
             text-align: center;
@@ -315,7 +306,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Footer */
         footer {
             text-align: center;
             padding: 40px 20px;
@@ -328,7 +318,17 @@
             text-decoration: none;
         }
         
-        /* Mobile */
+        .api-note {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--warning);
+            font-size: 0.9rem;
+        }
+        
         @media (max-width: 600px) {
             header h1 { font-size: 1.8rem; }
             .record-btn { width: 100px; height: 100px; font-size: 2.5rem; }
@@ -345,14 +345,16 @@
             <p>语音输入 → AI翻译 → 智能校正</p>
         </header>
         
-        <!-- Language Selector -->
+        <div class="api-note">
+            🤖 已连接 MiniMax-M2.5 AI
+        </div>
+        
         <div class="lang-selector">
             <button class="lang-btn active" data-lang="zh">🇨🇳 中文</button>
             <button class="lang-btn" data-lang="en">🇬🇧 English</button>
             <button class="lang-btn" data-lang="fi">🇫🇮 Suomi</button>
         </div>
         
-        <!-- AI Correction Toggle -->
         <div class="ai-toggle">
             <label>AI 智能校正</label>
             <label class="toggle-switch">
@@ -361,42 +363,45 @@
             </label>
         </div>
         
-        <!-- Voice Recorder -->
         <div class="recorder">
             <button class="record-btn" id="recordBtn">🎤</button>
             <p class="record-hint">点击开始录音，再次点击结束</p>
         </div>
         
-        <!-- Status -->
         <div class="status" id="status"></div>
         
-        <!-- Loading -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>正在处理...</p>
         </div>
         
-        <!-- Results -->
         <div class="results" id="results"></div>
         
         <footer>
-            <p>Powered by AI • 使用 Web Speech API</p>
+            <p>Powered by MiniMax-M2.5 AI • 使用 Web Speech API</p>
         </footer>
     </div>
     
     <script>
-        // State
+        // ========== 配置 ==========
+        const API_KEY = 'sk-cp-QljDVZSp9muzcrudlIgrN-M95Cwz8bHuRCci8NFVCp2lnGU6wpDm_duG9fq6PSh-EnbcbLI4ACc4WozYfBhfHifBE56O1iF6qZyr6lZrIpDW1SCmgREx-dE';
+        const API_URL = 'https://api.minimaxi.com/anthropic/v1/chat/completions';
+        
+        // ========== 状态 ==========
         let isRecording = false;
         let recognition = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
         let currentLang = 'zh';
         
-        // Language labels
         const langLabels = {
             zh: '中文',
             en: 'English',
             fi: 'Suomi'
+        };
+        
+        const langCodes = {
+            zh: 'zh-CN',
+            en: 'en-US', 
+            fi: 'fi-FI'
         };
         
         // UI Elements
@@ -416,13 +421,11 @@
             });
         });
         
-        // Check Web Speech API support
+        // Check Web Speech API
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
         if (!SpeechRecognition) {
-            status.textContent = '您的浏览器不支持语音识别，请使用 Chrome 或 Edge';
-            status.className = 'status error';
-            status.style.display = 'block';
+            showStatus('您的浏览器不支持语音识别，请使用 Chrome 或 Edge', 'error');
             recordBtn.disabled = true;
         }
         
@@ -431,7 +434,7 @@
             recognition = new SpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
-            recognition.lang = 'zh-CN';
+            recognition.lang = langCodes[currentLang];
             
             recognition.onstart = () => {
                 isRecording = true;
@@ -474,7 +477,6 @@
             
             recognition.onend = () => {
                 if (isRecording) {
-                    // Restart if still recording
                     try {
                         recognition.start();
                     } catch (e) {
@@ -484,7 +486,6 @@
             };
         }
         
-        // Start/Stop Recording
         function toggleRecording() {
             if (!isRecording) {
                 startRecording();
@@ -497,7 +498,6 @@
             if (!recognition) {
                 initRecognition();
             }
-            
             try {
                 recognition.start();
             } catch (e) {
@@ -517,7 +517,7 @@
             hideStatus();
         }
         
-        // Process voice input
+        // Process voice with MiniMax API
         async function processVoice(text) {
             if (!text.trim()) return;
             
@@ -525,59 +525,70 @@
             showStatus('AI 翻译中...', 'processing');
             
             try {
-                // Get target language
                 const targetLang = currentLang;
                 const useAICorrect = aiCorrectToggle.checked;
                 
-                // Build prompt
-                let prompt = `请将以下内容翻译成${langLabels[targetLang]}:\n\n${text}`;
+                let systemPrompt = '';
+                let userPrompt = '';
                 
                 if (useAICorrect) {
-                    prompt = `请完成以下任务：
-1. 将以下内容翻译成${langLabels[targetLang]}
-2. 如果原文是${langLabels[targetLang]}，则进行语法和用词校正
-3. 确保翻译/校正后的内容准确、流畅、自然
-
-原文: ${text}`;
+                    systemPrompt = `你是一个专业的翻译助手和语言校正专家。你的任务是：
+1. 识别输入文本的语言
+2. 将文本翻译成${langLabels[targetLang]}
+3. 如果输入已经是${langLabels[targetLang]}，则进行语法、用词、表达方式的校正
+4. 确保输出自然、流畅、专业
+5. 只输出翻译/校正后的内容，不要添加解释`;
+                    
+                    userPrompt = `请翻译或校正以下内容到${langLabels[targetLang]}:\n\n${text}`;
+                } else {
+                    systemPrompt = `你是一个专业的翻译助手。将输入的文本翻译成${langLabels[targetLang]}。只输出翻译内容，不要添加任何解释。`;
+                    userPrompt = `翻译: ${text}`;
                 }
                 
-                // Call AI API (using a simple mock for demo - would need actual API key)
-                const translated = await callAI(prompt);
+                const translated = await callMiniMaxAPI(systemPrompt, userPrompt);
                 
-                // Display results
                 displayResults(text, translated);
                 showStatus('翻译完成!', 'success');
                 
             } catch (error) {
                 console.error('Processing error:', error);
-                showStatus('处理失败，请重试', 'error');
+                showStatus('处理失败: ' + error.message, 'error');
             } finally {
                 showLoading(false);
             }
         }
         
-        // Mock AI call - Replace with actual API
-        async function callAI(prompt) {
-            // This is a placeholder. In production, you would:
-            // 1. Use OpenAI API
-            // 2. Use Anthropic API
-            // 3. Use a local LLM
+        // Call MiniMax API
+        async function callMiniMaxAPI(systemPrompt, userPrompt) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'MiniMax-M2.5',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userPrompt }
+                    ],
+                    max_tokens: 4096,
+                    temperature: 0.7
+                })
+            });
             
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API错误: ${response.status} - ${error}`);
+            }
             
-            // For demo, return a mock translation
-            // In reality, this would call an actual AI API
-            const targetLang = currentLang;
+            const data = await response.json();
             
-            // Mock translations
-            const mockTranslations = {
-                en: "This is a sample translation. In the actual version, this would be replaced with the real AI translation result using your API key.",
-                fi: "Tämä on esimerkki käännös. Todellisessa versiossa tämä korvataan todellisella AI-käännöstuloksella API-avaimellasi.",
-                zh: "这是一个示例翻译。在实际版本中，这将被替换为使用你的 API 密钥的真实 AI 翻译结果。"
-            };
-            
-            return mockTranslations[targetLang];
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                return data.choices[0].message.content.trim();
+            } else {
+                throw new Error('API返回格式错误');
+            }
         }
         
         // Display results
@@ -595,7 +606,6 @@
             `;
         }
         
-        // Helper functions
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
