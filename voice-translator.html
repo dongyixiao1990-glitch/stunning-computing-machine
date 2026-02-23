@@ -6,611 +6,351 @@
     <title>Voice Translator AI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #fff; min-height: 100vh; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
         
-        :root {
-            --primary: #0f0f1a;
-            --secondary: #1a1a2e;
-            --accent: #00d4aa;
-            --text: #ffffff;
-            --text-muted: #8888aa;
-            --border: #2a2a4a;
-            --card-bg: #16162a;
-        }
+        h1 { text-align: center; font-size: 1.8rem; margin-bottom: 20px; background: linear-gradient(90deg, #00d4aa, #00aaff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-            background: var(--primary);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
+        .lang-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .lang-btn { padding: 10px 20px; border: 2px solid #2a2a4a; background: #16162a; color: #888; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .lang-btn.active { background: #00d4aa; color: #000; border-color: #00d4aa; }
         
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
+        .ai-toggle { text-align: center; margin-bottom: 20px; padding: 10px; background: #16162a; border-radius: 10px; }
         
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .record-area { text-align: center; margin-bottom: 20px; }
+        .record-btn { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #00d4aa; background: #16162a; font-size: 2.5rem; cursor: pointer; }
+        .record-btn.recording { background: #ff4757; border-color: #ff4757; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,71,87,0.7); } 50% { box-shadow: 0 0 0 20px rgba(255,71,87,0); } }
+        .record-hint { margin-top: 10px; color: #666; font-size: 0.9rem; }
         
-        header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, #00d4aa, #00aaff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .status-msg { text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .status-msg.listen { display: block; background: rgba(255,71,87,0.2); color: #ff4757; }
+        .status-msg.process { display: block; background: rgba(255,165,0,0.2); color: #ffa500; }
+        .status-msg.done { display: block; background: rgba(0,212,170,0.2); color: #00d4aa; }
         
-        /* Language Buttons */
-        .lang-selector {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .lang-btn {
-            padding: 10px 20px;
-            border: 2px solid var(--border);
-            background: var(--card-bg);
-            color: var(--text-muted);
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .lang-btn:hover { border-color: var(--accent); }
-        
-        .lang-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: var(--primary);
-        }
-        
-        /* AI Toggle */
-        .ai-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 25px;
-            padding: 12px;
-            background: var(--card-bg);
-            border-radius: 10px;
-        }
-        
-        /* Record Button */
-        .recorder { text-align: center; margin-bottom: 25px; }
-        
-        .record-btn {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 4px solid var(--accent);
-            background: var(--card-bg);
-            cursor: pointer;
-            font-size: 2.5rem;
-            transition: all 0.3s;
-        }
-        
-        .record-btn:hover { transform: scale(1.05); }
-        
-        .record-btn.recording {
-            background: #ff4757;
-            border-color: #ff4757;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,71,87,0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(255,71,87,0); }
-        }
-        
-        .record-hint {
-            margin-top: 10px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-        
-        /* Status */
-        .status {
-            text-align: center;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-weight: 500;
-        }
-        
-        .status.listening { display: block; background: rgba(255,71,87,0.2); color: #ff4757; }
-        .status.processing { display: block; background: rgba(255,165,0,0.2); color: #ffa500; }
-        .status.success { display: block; background: rgba(0,212,170,0.2); color: var(--accent); }
-        
-        /* Results Box */
-        .results-box {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-            display: none;
-        }
-        
-        .results-box.show { display: block; }
-        
-        .results-box h2 {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .result-row {
-            margin-bottom: 20px;
-        }
-        
-        .result-row:last-child { margin-bottom: 0; }
-        
-        .result-row label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        
-        .result-row .text {
-            background: var(--secondary);
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .result-row .text.original { color: var(--text-muted); font-style: italic; }
-        .result-row .text.translated { color: var(--accent); font-weight: 600; }
-        
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .action-btn.primary {
-            background: var(--accent);
-            color: var(--primary);
-        }
-        
-        .action-btn.secondary {
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        
-        .action-btn:hover { opacity: 0.9; transform: scale(1.02); }
-        
-        /* History */
-        .history-section {
-            margin-top: 30px;
-        }
-        
-        .history-section h2 {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .clear-history {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
-        
-        .clear-history:hover { color: #ff4757; }
-        
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .history-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .history-item:hover { border-color: var(--accent); }
-        
-        .history-item .original {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .history-item .translated {
-            font-size: 1rem;
-            color: var(--accent);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .history-item .meta {
-            font-size: 0.75rem;
-            color: #555;
-            margin-top: 8px;
-        }
-        
-        .history-empty {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 30px;
-            font-size: 0.9rem;
-        }
-        
-        /* Loading */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 30px;
-        }
-        
+        .loading { display: none; text-align: center; padding: 30px; }
         .loading.show { display: block; }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
+        .spinner { width: 40px; height: 40px; border: 3px solid #2a2a4a; border-top-color: #00d4aa; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
+        /* 结果显示区域 */
+        .result-area { background: #16162a; border: 2px solid #2a2a4a; border-radius: 15px; padding: 20px; margin-bottom: 20px; display: none; }
+        .result-area.show { display: block; }
+        .result-area h2 { font-size: 1rem; color: #888; margin-bottom: 15px; }
         
-        @media (max-width: 500px) {
-            .lang-btn { padding: 8px 14px; font-size: 0.9rem; }
-            .record-btn { width: 80px; height: 80px; font-size: 2rem; }
-        }
+        .result-box { margin-bottom: 15px; }
+        .result-box label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 5px; }
+        .result-box .content { background: #0f0f1a; padding: 15px; border-radius: 10px; font-size: 1.1rem; line-height: 1.5; min-height: 50px; word-wrap: break-word; }
+        .result-box .content.original { color: #888; font-style: italic; }
+        .result-box .content.translated { color: #00d4aa; font-weight: bold; }
+        
+        .btn-row { display: flex; gap: 10px; }
+        .btn-row button { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-copy { background: #00d4aa; color: #000; }
+        .btn-speak { background: #2a2a4a; color: #fff; }
+        
+        /* 历史记录 */
+        .history-area { margin-top: 30px; }
+        .history-area h2 { font-size: 1rem; color: #888; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .clear-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 0.85rem; }
+        .clear-btn:hover { color: #ff4757; }
+        
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item { background: #16162a; border: 1px solid #2a2a4a; border-radius: 12px; padding: 15px; cursor: pointer; }
+        .history-item:hover { border-color: #00d4aa; }
+        .history-item .orig { color: #666; font-size: 0.85rem; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-item .trans { color: #00d4aa; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-item .time { font-size: 0.7rem; color: #444; margin-top: 5px; }
+        
+        .no-history { text-align: center; color: #444; padding: 30px; }
+        
+        footer { text-align: center; padding: 30px; color: #444; font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎙️ Voice Translator AI</h1>
-        </header>
+        <h1>🎙️ Voice Translator AI</h1>
         
-        <!-- Language Selector -->
-        <div class="lang-selector">
-            <button class="lang-btn active" data-lang="zh">🇨🇳 中文</button>
-            <button class="lang-btn" data-lang="en">🇬🇧 English</button>
-            <button class="lang-btn" data-lang="fi">🇫🇮 Suomi</button>
+        <!-- 语言选择 -->
+        <div class="lang-buttons">
+            <button class="lang-btn active" data-lang="zh">中文</button>
+            <button class="lang-btn" data-lang="en">English</button>
+            <button class="lang-btn" data-lang="fi">Suomi</button>
         </div>
         
-        <!-- AI Correction Toggle -->
+        <!-- AI校正 -->
         <div class="ai-toggle">
-            <span>✨ AI 智能校正</span>
-            <input type="checkbox" id="aiCorrect" checked>
+            <label><input type="checkbox" id="aiCorrect" checked> ✨ AI智能校正</label>
         </div>
         
-        <!-- Record Button -->
-        <div class="recorder">
+        <!-- 录音按钮 -->
+        <div class="record-area">
             <button class="record-btn" id="recordBtn">🎤</button>
             <p class="record-hint">点击开始录音，再次点击结束</p>
         </div>
         
-        <!-- Status -->
-        <div class="status" id="status"></div>
+        <!-- 状态消息 -->
+        <div class="status-msg" id="statusMsg"></div>
         
-        <!-- Loading -->
+        <!-- 加载中 -->
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>正在处理...</p>
+            <p>处理中...</p>
         </div>
         
-        <!-- Results Display -->
-        <div class="results-box" id="resultsBox">
+        <!-- 结果显示 -->
+        <div class="result-area" id="resultArea">
             <h2>📋 翻译结果</h2>
             
-            <div class="result-row">
+            <div class="result-box">
                 <label>🎤 原始语音</label>
-                <div class="text original" id="originalText"></div>
+                <div class="content original" id="originalContent">--</div>
             </div>
             
-            <div class="result-row">
+            <div class="result-box">
                 <label>🌍 翻译结果</label>
-                <div class="text translated" id="translatedText"></div>
+                <div class="content translated" id="translatedContent">--</div>
             </div>
             
-            <div class="action-buttons">
-                <button class="action-btn primary" onclick="copyResult()">📋 复制结果</button>
-                <button class="action-btn secondary" onclick="speakResult()">🔊 朗读</button>
+            <div class="btn-row">
+                <button class="btn-copy" onclick="copyResult()">📋 复制结果</button>
+                <button class="btn-speak" onclick="speakResult()">🔊 朗读</button>
             </div>
         </div>
         
-        <!-- History -->
-        <div class="history-section">
+        <!-- 历史记录 -->
+        <div class="history-area">
             <h2>
                 <span>📜 历史记录</span>
-                <button class="clear-history" onclick="clearHistory()">清除全部</button>
+                <button class="clear-btn" onclick="clearHistory()">清除</button>
             </h2>
             <div class="history-list" id="historyList">
-                <div class="history-empty">暂无历史记录</div>
+                <div class="no-history">暂无历史记录</div>
             </div>
         </div>
         
-        <footer>
-            Powered by MiniMax-M2.5 AI
-        </footer>
+        <footer>Powered by MiniMax-M2.5 AI</footer>
     </div>
     
     <script>
-        // ========== 配置 ==========
-        const API_KEY = 'sk-cp-QljDVZSp9muzcrudlIgrN-M95Cwz8bHuRCci8NFVCp2lnGU6wpDm_duG9fq6PSh-EnbcbLI4ACc4WozYfBhfHifBE56O1iF6qZyr6lZrIpDW1SCmgREx-dE';
-        const API_URL = 'https://api.minimaxi.com/anthropic/v1/chat/completions';
+    // ===== 配置 =====
+    const API_KEY = 'sk-cp-QljDVZSp9muzcrudlIgrN-M95Cwz8bHuRCci8NFVCp2lnGU6wpDm_duG9fq6PSh-EnbcbLI4ACc4WozYfBhfHifBE56O1iF6qZyr6lZrIpDW1SCmgREx-dE';
+    const API_URL = 'https://api.minimaxi.com/anthropic/v1/chat/completions';
+    
+    // ===== 变量 =====
+    let isRecording = false;
+    let recognition = null;
+    let currentLang = 'zh';
+    let currentOriginal = '';
+    let currentTranslated = '';
+    let history = JSON.parse(localStorage.getItem('vt_history') || '[]');
+    
+    const langCodes = { zh: 'zh-CN', en: 'en-US', fi: 'fi-FI' };
+    const langNames = { zh: 'Chinese', en: 'English', fi: 'Finnish' };
+    const langLabels = { zh: '中文', en: 'English', fi: 'Suomi' };
+    
+    // ===== DOM元素 =====
+    const recordBtn = document.getElementById('recordBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const loading = document.getElementById('loading');
+    const resultArea = document.getElementById('resultArea');
+    const originalContent = document.getElementById('originalContent');
+    const translatedContent = document.getElementById('translatedContent');
+    const historyList = document.getElementById('historyList');
+    const langBtns = document.querySelectorAll('.lang-btn');
+    
+    // 初始化
+    renderHistory();
+    
+    // 语言按钮
+    langBtns.forEach(btn => {
+        btn.onclick = () => {
+            langBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLang = btn.dataset.lang;
+        };
+    });
+    
+    // 语音识别
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        showStatus('⚠️ 请使用Chrome浏览器', 'listen');
+        recordBtn.disabled = true;
+    }
+    
+    function initRecognition() {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = langCodes[currentLang];
         
-        // ========== 状态 ==========
-        let isRecording = false;
-        let recognition = null;
-        let currentLang = 'zh';
-        let currentOriginal = '';
-        let currentTranslated = '';
-        let history = JSON.parse(localStorage.getItem('voiceTransHistory') || '[]');
+        recognition.onstart = () => {
+            isRecording = true;
+            recordBtn.classList.add('recording');
+            recordBtn.textContent = '⏹';
+            resultArea.classList.remove('show');
+            showStatus('🎤 正在聆听...', 'listen');
+        };
         
-        const langLabels = { zh: '中文', en: 'English', fi: 'Suomi' };
-        const langCodes = { zh: 'zh-CN', en: 'en-US', fi: 'fi-FI' };
-        const langNames = { zh: 'Chinese', en: 'English', fi: 'Finnish' };
+        recognition.onresult = (e) => {
+            let final = '', interim = '';
+            for (let i = e.resultIndex; i < e.results.length; i++) {
+                if (e.results[i].isFinal) final += e.results[i][0].transcript;
+                else interim += e.results[i][0].transcript;
+            }
+            if (interim) showStatus('识别: ' + interim, 'listen');
+            if (final) processVoice(final);
+        };
         
-        // ========== DOM ==========
-        const recordBtn = document.getElementById('recordBtn');
-        const status = document.getElementById('status');
-        const loading = document.getElementById('loading');
-        const resultsBox = document.getElementById('resultsBox');
-        const originalText = document.getElementById('originalText');
-        const translatedText = document.getElementById('translatedText');
-        const historyList = document.getElementById('historyList');
-        const langBtns = document.querySelectorAll('.lang-btn');
+        recognition.onerror = (e) => {
+            if (e.error === 'no-speech') {
+                showStatus('⚠️ 未检测到语音', 'listen');
+                setTimeout(stopRecording, 1500);
+            }
+        };
         
-        // 初始化
+        recognition.onend = () => { if (isRecording) try { recognition.start(); } catch(e){} };
+    }
+    
+    recordBtn.onclick = () => {
+        if (!isRecording) {
+            if (!recognition) initRecognition();
+            try { recognition.start(); } catch(e) {}
+        } else {
+            stopRecording();
+        }
+    };
+    
+    function stopRecording() {
+        isRecording = false;
+        recordBtn.classList.remove('recording');
+        recordBtn.textContent = '🎤';
+        if (recognition) recognition.stop();
+        statusMsg.style.display = 'none';
+    }
+    
+    // 处理语音
+    async function processVoice(text) {
+        if (!text.trim()) return;
+        currentOriginal = text;
+        showStatus('🤖 AI翻译中...', 'process');
+        loading.classList.add('show');
+        
+        try {
+            const useAI = document.getElementById('aiCorrect').checked;
+            const system = useAI 
+                ? `Translate to ${langNames[currentLang]}. If already in ${langNames[currentLang]}, correct grammar. Output only the result.`
+                : `Translate to ${langNames[currentLang]}. Output only the translated text.`;
+            
+            const result = await callAPI(system, text);
+            currentTranslated = result;
+            
+            // 显示结果
+            originalContent.textContent = text;
+            translatedContent.textContent = result;
+            resultArea.classList.add('show');
+            
+            // 保存历史
+            addToHistory(text, result);
+            
+            showStatus('✅ 翻译完成!', 'done');
+        } catch (err) {
+            showStatus('❌ 错误: ' + err.message, 'listen');
+        } finally {
+            loading.classList.remove('show');
+        }
+    }
+    
+    // API调用
+    async function callAPI(system, user) {
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+            body: JSON.stringify({
+                model: 'MiniMax-M2.5',
+                messages: [{ role: 'system', content: system }, { role: 'user', content: 'Translate: ' + user }],
+                max_tokens: 4096, temperature: 0.7
+            })
+        });
+        if (!res.ok) throw new Error('API错误');
+        const data = await res.json();
+        if (!data.choices?.[0]?.message?.content) throw new Error('返回格式错误');
+        return data.choices[0].message.content.trim();
+    }
+    
+    // 历史记录
+    function addToHistory(orig, trans) {
+        const item = { orig, trans, lang: currentLang, time: new Date().toLocaleString() };
+        history.unshift(item);
+        if (history.length > 20) history.pop();
+        localStorage.setItem('vt_history', JSON.stringify(history));
         renderHistory();
-        
-        // 语言选择
-        langBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                langBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentLang = btn.dataset.lang;
-            });
-        });
-        
-        // 语音识别
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
-        if (!SpeechRecognition) {
-            showStatus('⚠️ 您的浏览器不支持语音识别，请使用 Chrome', 'error');
-            recordBtn.disabled = true;
+    }
+    
+    function renderHistory() {
+        if (history.length === 0) {
+            historyList.innerHTML = '<div class="no-history">暂无历史记录</div>';
+            return;
         }
+        historyList.innerHTML = history.map((item, i) => 
+            '<div class="history-item" onclick="viewHistory(' + i + ')">' +
+                '<div class="orig">' + item.orig + '</div>' +
+                '<div class="trans">' + item.trans + '</div>' +
+                '<div class="time">' + langLabels[item.lang] + ' • ' + item.time + '</div>' +
+            '</div>'
+        ).join('');
+    }
+    
+    function viewHistory(i) {
+        const item = history[i];
+        currentOriginal = item.orig;
+        currentTranslated = item.trans;
+        currentLang = item.lang;
         
-        function initRecognition() {
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = langCodes[currentLang];
-            
-            recognition.onstart = () => {
-                isRecording = true;
-                recordBtn.classList.add('recording');
-                recordBtn.textContent = '⏹';
-                showStatus('🎤 正在聆听...', 'listening');
-                resultsBox.classList.remove('show');
-            };
-            
-            recognition.onresult = (event) => {
-                let final = '', interim = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    if (event.results[i].isFinal) final += event.results[i][0].transcript;
-                    else interim += event.results[i][0].transcript;
-                }
-                if (interim) showStatus(`识别中: ${interim}...`, 'listening');
-                if (final) processVoice(final);
-            };
-            
-            recognition.onerror = (e) => {
-                if (e.error === 'no-speech') {
-                    showStatus('⚠️ 未检测到语音', 'error');
-                    setTimeout(stopRecording, 1500);
-                }
-            };
-            
-            recognition.onend = () => {
-                if (isRecording) try { recognition.start(); } catch(e) {}
-            };
-        }
-        
-        recordBtn.addEventListener('click', () => {
-            if (!isRecording) {
-                if (!recognition) initRecognition();
-                try { recognition.start(); } catch(e) {}
-            } else {
-                stopRecording();
-            }
-        });
-        
-        function stopRecording() {
-            isRecording = false;
-            recordBtn.classList.remove('recording');
-            recordBtn.textContent = '🎤';
-            if (recognition) recognition.stop();
-            hideStatus();
-        }
-        
-        // 处理语音
-        async function processVoice(text) {
-            if (!text.trim()) return;
-            currentOriginal = text;
-            showLoading(true);
-            showStatus('🤖 AI 翻译中...', 'processing');
-            
-            try {
-                const useAICorrect = document.getElementById('aiCorrect').checked;
-                const targetLang = currentLang;
-                
-                let systemPrompt = useAICorrect 
-                    ? `You are a professional translator. Translate to ${langNames[targetLang]}. If already in ${langNames[targetLang]}, correct grammar. Only output the result, no explanation.`
-                    : `You are a professional translator. Translate to ${langNames[targetLang]}. Only output the translated text, no explanation.`;
-                
-                const result = await callAPI(systemPrompt, `Translate: ${text}`);
-                currentTranslated = result;
-                
-                showResult(text, result);
-                addToHistory(text, result);
-                showStatus('✅ 翻译完成!', 'success');
-            } catch (err) {
-                showStatus('❌ 错误: ' + err.message, 'error');
-            } finally {
-                showLoading(false);
-            }
-        }
-        
-        // 调用 API
-        async function callAPI(system, user) {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
-                body: JSON.stringify({
-                    model: 'MiniMax-M2.5',
-                    messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-                    max_tokens: 4096, temperature: 0.7
-                })
-            });
-            
-            if (!res.ok) throw new Error('API请求失败');
-            const data = await res.json();
-            if (!data.choices?.[0]?.message?.content) throw new Error('API返回格式错误');
-            return data.choices[0].message.content.trim();
-        }
+        // 更新语言按钮
+        langBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === item.lang));
         
         // 显示结果
-        function showResult(original, translated) {
-            resultsBox.classList.add('show');
-            originalText.textContent = original;
-            translatedText.textContent = translated;
-            resultsBox.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // 历史记录
-        function addToHistory(original, translated) {
-            const item = {
-                original,
-                translated,
-                lang: currentLang,
-                time: new Date().toLocaleString()
-            };
-            history.unshift(item);
-            if (history.length > 20) history.pop();
-            localStorage.setItem('voiceTransHistory', JSON.stringify(history));
+        originalContent.textContent = item.orig;
+        translatedContent.textContent = item.trans;
+        resultArea.classList.add('show');
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function clearHistory() {
+        if (confirm('清除所有历史?')) {
+            history = [];
+            localStorage.removeItem('vt_history');
             renderHistory();
         }
-        
-        function renderHistory() {
-            if (history.length === 0) {
-                historyList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
-                return;
-            }
-            historyList.innerHTML = history.map((item, i) => `
-                <div class="history-item" onclick="loadHistory(${i})">
-                    <div class="original">${item.original}</div>
-                    <div class="translated">${item.translated}</div>
-                    <div class="meta">${langLabels[item.lang]} • ${item.time}</div>
-                </div>
-            `).join('');
-        }
-        
-        function loadHistory(i) {
-            const item = history[i];
-            currentOriginal = item.original;
-            currentTranslated = item.translated;
-            
-            // 切换到对应的语言
-            langBtns.forEach(b => b.classList.toggle('active', b.dataset.lang === item.lang));
-            currentLang = item.lang;
-            
-            showResult(item.original, item.translated);
-        }
-        
-        function clearHistory() {
-            if (confirm('确定清除所有历史记录?')) {
-                history = [];
-                localStorage.removeItem('voiceTransHistory');
-                renderHistory();
-            }
-        }
-        
-        // 工具函数
-        function showStatus(msg, type) {
-            status.textContent = msg;
-            status.className = 'status ' + type;
-        }
-        
-        function hideStatus() { status.style.display = 'none'; }
-        function showLoading(show) { loading.classList.toggle('show', show); }
-        
-        function copyResult() {
-            navigator.clipboard.writeText(currentTranslated).then(() => {
-                showStatus('✅ 已复制到剪贴板!', 'success');
-                setTimeout(hideStatus, 2000);
-            });
-        }
-        
-        function speakResult() {
-            const utterance = new SpeechSynthesisUtterance(currentTranslated);
-            utterance.lang = langCodes[currentLang];
-            speechSynthesis.speak(utterance);
-        }
-        
-        // 空格键快捷键
-        document.addEventListener('keydown', e => {
-            if (e.code === 'Space' && !e.target.matches('input,textarea')) {
-                e.preventDefault();
-                recordBtn.click();
-            }
+    }
+    
+    // 工具
+    function showStatus(msg, type) {
+        statusMsg.textContent = msg;
+        statusMsg.className = 'status-msg ' + type;
+    }
+    
+    function copyResult() {
+        navigator.clipboard.writeText(currentTranslated).then(() => {
+            showStatus('✅ 已复制!', 'done');
+            setTimeout(() => { statusMsg.style.display = 'none'; }, 2000);
         });
+    }
+    
+    function speakResult() {
+        const u = new SpeechSynthesisUtterance(currentTranslated);
+        u.lang = langCodes[currentLang];
+        speechSynthesis.speak(u);
+    }
+    
+    // 空格键录音
+    document.onkeydown = e => {
+        if (e.code === 'Space' && !e.target.matches('input,textarea')) {
+            e.preventDefault();
+            recordBtn.click();
+        }
+    };
     </script>
 </body>
 </html>
