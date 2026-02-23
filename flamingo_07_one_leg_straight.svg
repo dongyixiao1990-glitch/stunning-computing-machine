@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 150">
+  <g fill="#000000">
+    <ellipse cx="45" cy="85" rx="25" ry="15"/>
+    <path d="M65 75 Q82 52 78 35 Q75 20 80 12" fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="80" cy="14" r="4"/>
+    <path d="M84 12 Q95 8 91 17 Q86 20 82 16 Z"/>
+    <line x1="45" y1="97" x2="45" y2="145" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="30" cy="78" rx="10" ry="6" transform="rotate(-8 30 78)"/>
+  </g>
+</svgEOF
+
+# 8. Profile Left
+cat > flamingo_08_face_left.svg << 'SVGEOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
+  <g fill="#000000">
+    <ellipse cx="75" cy="60" rx="30" ry="18"/>
+    <path d="M100 50 Q115 40 112 25 Q110 15 105 10" fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="105" cy="12" r="5"/>
+    <path d="M98 10 Q90 8 92 18" fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+    <line x1="60" y1="75" x2="45" y2="95" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+    <line x1="70" y1="75" x2="85" y2="95" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="50" cy="55" rx="12" ry="7" transform="rotate(-5 50 55)"/>
+  </g>
+</svg>
