@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <!-- Top Disk Design (80mm diameter) for Fusion360 -->
+  
+  <!-- Outer ring - Black -->
+  <circle cx="40" cy="40" r="40" fill="#1a1a1a"/>
+  
+  <!-- Yellow ring -->
+  <circle cx="40" cy="40" r="37" fill="none" stroke="#ffd41b" stroke-width="3"/>
+  
+  <!-- Inner circle - Magenta -->
+  <circle cx="40" cy="40" r="28" fill="#ff00aa"/>
+  
+  <!-- Flamingo in white -->
+  <g fill="#ffffff">
+    <ellipse cx="35" cy="42" rx="10" ry="7"/>
+    <circle cx="42" cy="28" r="3"/>
+    <path d="M44 27 Q48 22 47 26" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <line x1="32" y1="48" x2="30" y2="58" stroke="#ffffff" stroke-width="1.5"/>
+    <line x1="36" y1="48" x2="38" y2="56" stroke="#ffffff" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Center hole (will be cut out) -->
+  <circle cx="40" cy="40" r="3" fill="#1a1a1a"/>
+</svg>
